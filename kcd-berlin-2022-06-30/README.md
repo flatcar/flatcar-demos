@@ -14,6 +14,12 @@ The script forwards connections to host port 8080 to container port 80 so we can
 Download a Flatcar release (NOT the current / most recent one) from [here](https://www.flatcar.org/releases/).
 Use an older version to demo updates.
 
+Move the image to a new name to keep a pristine version; copy it to the original name to have a working copy.
+```shell
+mv flatcar_production_qemu_image.img flatcar_production_qemu_image.img.pristine
+cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
+```
+
 1. Create ignition from YAML:
    ```shell
    cat talk.yaml | docker run --rm -v $(pwd):/files -i ghcr.io/flatcar-linux/ct:latest --files-dir /files  > ignition.json
@@ -35,7 +41,7 @@ Use an older version to demo updates.
 update_engine_client -status
 ls -la /var/run/reboot-required
 
-update_engine_client -watch_for_updates
+update_engine_client -check_for_updates
 
 update_engine_client -status
 ls -la /var/run/reboot-required
