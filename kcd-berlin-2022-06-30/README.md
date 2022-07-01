@@ -7,12 +7,11 @@ YAML config contains
 4. Deactivate automated reboots
 
 We ship a custom `flatcar_production_qemu.sh` because at the time of writing the script did not support forwarding custom ports.
-The script forwards connections to host port 8080 to container port 80 so we can serve websites.
+The script forwards connections to host port 8080 from VM port 80 so we can access the website via [http://localhost:8080](http://localhost:8080).
 
 ## Provisioning Demo
 
-Download a Flatcar release (NOT the current / most recent one) from [here](https://www.flatcar.org/releases/).
-Use an older version to demo updates.
+Download a Flatcar release (NOT the current / most recent one; use an older version to demo updates) from [here](https://www.flatcar.org/releases/).
 
 Move the image to a new name to keep a pristine version; copy it to the original name to have a working copy.
 ```shell
@@ -26,7 +25,7 @@ cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
    ```
 2. Start flatcar
    ```shell
-   ./flatcar_production_qemu.sh -i ignition.json -nographic
+   ./flatcar_production_qemu.sh -i ignition.json --nographic
    ```
 3. Point your browser to [http://localhost:8080](http://localhost:8080).
 4. SSH into the instance
@@ -37,18 +36,27 @@ cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
 
 
 ## Update demo
-```shell
-update_engine_client -status
-ls -la /var/run/reboot-required
 
-update_engine_client -check_for_updates
+Using the instance provisioned above we'll check for updates, stage, and activate (reboot).
+It might be necesssary to re-provision (i.e. start from a pristine downloaded image) depending on the time spent on the instance above.
+(Instance might have staged the update already).
 
-update_engine_client -status
-ls -la /var/run/reboot-required
-
-cat /etc/os-release
-
-reboot
-
-cat /etc/os-release
-```
+1. Check update status, reboot flag (it's not there), and OS version.
+   ```shell
+   update_engine_client -status
+   ls -la /var/run/reboot-required
+   cat /etc/os-release
+   ```
+2. Check for update (which will trigger update download), re-check status (maybe use watch).
+   ```shell
+   update_engine_client -check_for_update
+   update_engine_client -status
+   watch update_engine_client -status
+   ```
+3. Check for "reboot required" flag file, activate update.
+   ```shell
+   ls -la /var/run/reboot-required
+   cat /etc/os-release
+   reboot
+   cat /etc/os-release
+   ```
