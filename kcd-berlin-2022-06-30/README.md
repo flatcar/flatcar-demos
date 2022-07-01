@@ -6,12 +6,10 @@ YAML config contains
 3. Systemd unit for running caddy to serve the file
 4. Deactivate automated reboots
 
-We ship a custom `flatcar_production_qemu.sh` because at the time of writing the script did not support forwarding custom ports.
-The script forwards connections to host port 8080 from VM port 80 so we can access the website via [http://localhost:8080](http://localhost:8080).
-
 ## Provisioning Demo
 
 Download a Flatcar release (NOT the current / most recent one; use an older version to demo updates) from [here](https://www.flatcar.org/releases/).
+Don't forget to also download the accompanying `flatcar_production_qemu.sh`; we'll need it for the demo.
 
 Move the image to a new name to keep a pristine version; copy it to the original name to have a working copy.
 ```shell
@@ -23,9 +21,9 @@ cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
    ```shell
    cat talk.yaml | docker run --rm -v $(pwd):/files -i ghcr.io/flatcar-linux/ct:latest --files-dir /files  > ignition.json
    ```
-2. Start flatcar
+2. Start flatcar. Kudos to @pothos for the cool port forwarding hack.
    ```shell
-   ./flatcar_production_qemu.sh -i ignition.json --nographic
+   ./flatcar_production_qemu.sh -i ignition.json -p 8080-:80,hostfwd=tcp::2222 --nographic
    ```
 3. Point your browser to [http://localhost:8080](http://localhost:8080).
 4. SSH into the instance
