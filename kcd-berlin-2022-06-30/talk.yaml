@@ -43,7 +43,7 @@ systemd:
         User=caddy
         TimeoutStartSec=0
         ExecStartPre=-/usr/bin/docker rm --force caddy
-        ExecStart=docker run -i -p 80:80 --name caddy \
+        ExecStart=/usr/bin/docker run -i -p 80:80 --name caddy \
                   -v /srv/www/html:/usr/share/caddy \
                   docker.io/caddy caddy file-server \
                   --root /usr/share/caddy --access-log

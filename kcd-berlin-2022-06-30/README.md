@@ -37,7 +37,7 @@ cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
 
 Using the instance provisioned above we'll check for updates, stage, and activate (reboot).
 While the default behavior of Flatcar is to reboot automatically, this has been turned off in the Ignition config (see `reboot_strategy` in the YAML file).
-It might be necesssary to re-provision fro scratch (i.e. start from a new copy of the pristine downloaded) depending on the time spent on the instance above since the nstance might have staged the update already.
+It might be necessary to re-provision fro scratch (i.e. start from a new copy of the pristine downloaded) depending on the time spent on the instance above since the instance might have staged the update already.
 
 Alternatively we could use `update_engine_client -reset_status` and then make `update_engine` check again - this can also be used to discard staged (but outdated) updates in favour of a fresh download of the latest release.
 
