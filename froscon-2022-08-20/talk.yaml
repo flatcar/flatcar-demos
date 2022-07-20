@@ -36,7 +36,7 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=KCD example static web server
+        Description=FrOSCon example static web server
         After=docker.service
         Requires=docker.service
         [Service]
