@@ -18,7 +18,7 @@ storage:
       contents:
         inline: |
           <html><body align="center">
-          <h1>Hallo, FroSCon!</h1>
+          <h1>Hallo, FrOSCon!</h1>
           <img src="froscon.png" alt="FrOSCon logo" />
           </body></html>
     - path: /srv/www/html/froscon.png
