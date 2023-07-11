@@ -1,0 +1,56 @@
+passwd:
+  users:
+    - name: caddy
+      no_create_home: true
+      groups: [ docker ]
+
+storage:
+  files:
+    - path: /srv/www/html/index.html
+      mode: 0644
+      user:
+        name: caddy
+      group:
+        name: caddy
+      contents:
+        inline: |
+          <html><body align="center">
+          <h1>Hello KCD!</h1>
+          <img src="kcd.png" alt="KCD logo" />
+          </body></html>
+    - path: /srv/www/html/kcd.png
+      mode: 0644
+      user:
+        name: caddy
+      group:
+        name: caddy
+      contents:
+        local: kcd.png
+    - path: /etc/flatcar/update.conf
+      contents:
+        inline: |
+          REBOOT_STRATEGY=off
+      mode: 0420
+
+systemd:
+  units:
+    - name: kcd-demo-webserver.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=KCD example static web server
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        User=caddy
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm --force caddy
+        ExecStart=/usr/bin/docker run -i -p 80:80 --name caddy \
+                  -v /srv/www/html:/usr/share/caddy \
+                  docker.io/caddy caddy file-server \
+                  --root /usr/share/caddy --access-log
+        ExecStop=/usr/bin/docker stop caddy
+        Restart=always
+        RestartSec=5s
+        [Install]
+        WantedBy=multi-user.target
