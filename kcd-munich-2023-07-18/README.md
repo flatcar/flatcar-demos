@@ -19,7 +19,7 @@ cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
 
 1. Create ignition from YAML:
    ```shell
-   cat talk.yaml | docker run --rm -v $(pwd):/files -i ghcr.io/flatcar-linux/ct:latest --files-dir /files  > ignition.json
+   cat talk.yaml | docker run --rm -v $(pwd):/files -i quay.io/coreos/butane:latest --files-dir /files  > ignition.json
    ```
 2. Start flatcar. Kudos to @pothos for the cool port forwarding hack.
    ```shell
