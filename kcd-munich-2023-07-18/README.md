@@ -44,19 +44,55 @@ Alternatively we could use `update_engine_client -reset_status` and then make `u
 1. Check update status, reboot flag (it's not there), and OS version.
    ```shell
    update_engine_client -status
-   ls -la /var/run/reboot-required
-   cat /etc/os-release
    ```
 2. Check for update (which will trigger update download), re-check status (maybe use watch).
    ```shell
    update_engine_client -check_for_update
    update_engine_client -status
-   watch update_engine_client -status
    ```
-3. Check for "reboot required" flag file, activate update.
+3. After the update was downloaded and staged, check OS and kernel version, then activate update.
    ```shell
-   ls -la /var/run/reboot-required
    cat /etc/os-release
    reboot
+   uname -a
    cat /etc/os-release
+   uname -a
    ```
+
+# Sysext demo
+
+This demo uses a wasmtime sysext built via https://github.com/flatcar/sysext-bakery.
+The example below uses wasmtime-8 but it should work with any version.
+
+For this demo, we'll provide the wasmtime sysext via a "virt/" subdirectory on the host which we'll import in the VM using the 9p filesystem.
+
+The Flatcar VM needs to be started with an additional option for the import to become available:
+```shell
+./flatcar_production_qemu.sh -virtfs local,path=$(pwd)/virt,mount_tag=host0,security_model=passthrough,id=host0
+```
+
+In the VM, we mount the 9pfs and copy wasmtime into the extensions directory.
+```shell
+mount -t 9p -o trans=virtio,version=9p2000.L host0 /mnt
+cp /mnt/wasmtime-8.raw /etc/extensions/
+```
+
+We check if the `wasmtime` binary is available (it shouldn't):
+```shell
+wasmtime
+ls -la /usr/bin/wasmtime
+```
+
+Now we list available extensions, check extensions status, and activate the wasmtime extension:
+```shell
+systemd-sysext list
+systemd-sysext status
+systemd-sysext refresh
+systemd-sysext status
+```
+
+We check again and `wasmtime` is now available:
+```shell
+wasmtime
+ls -la /usr/bin/wasmtime
+```

@@ -38,6 +38,8 @@ storage:
 
 systemd:
   units:
+    - name: update-engine.service
+      mask: true
     - name: kcd-demo-webserver.service
       enabled: true
       contents: |
