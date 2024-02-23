@@ -1,0 +1,20 @@
+variant: flatcar
+version: 1.0.0
+
+storage:
+  files:
+    - path: /opt/extensions/wasmtime/wasmtime-17.0.1-x86-64.raw
+      mode: 0644
+      contents:
+        source: "http://172.16.0.99:8000/wasmtime-17.0.1-x86-64.raw"
+    - path: /etc/flatcar/update.conf
+      overwrite: true
+      contents:
+        inline: |
+          REBOOT_STRATEGY=off
+      mode: 0420
+
+systemd:
+  units:
+    - name: update-engine.service
+      mask: true
