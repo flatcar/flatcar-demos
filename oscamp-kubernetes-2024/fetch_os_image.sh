@@ -18,14 +18,7 @@ curl -fLO --progress-bar --retry-delay 1 --retry 60 --retry-connrefused \
         "${url}/flatcar_production_qemu.sh"
 curl -fLO --progress-bar --retry-delay 1 --retry 60 --retry-connrefused \
         --retry-max-time 60 --connect-timeout 20 \
-        "${url}/flatcar_production_qemu_image.img.bz2"
-
-echo
-echo    Uncompressing
-echo
-
-bunzip2 flatcar_production_qemu_image.img.bz2
-chmod 755 flatcar_production_qemu.sh
+        "${url}/flatcar_production_qemu_image.img"
 
 echo
 echo    Creating pristine copy

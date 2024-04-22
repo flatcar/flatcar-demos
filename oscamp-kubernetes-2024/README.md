@@ -64,7 +64,7 @@ docker ps
 ## Update demo
 
 This can be done with the same deployment used for the web server demo as we're
-not provisoining anything new.
+not provisioning anything new.
 
 Via the serial console, first enable update engine
 ```
@@ -131,7 +131,7 @@ cp flatcar_production_qemu_image.img.pristine flatcar_production_qemu_image.img
 
 
 The demo will need a temporary web server running on the host (we use python's
-built-in http:server). Flatcar from inside the VM will need a well-known IP
+built-in http.server). Flatcar from inside the VM will need a well-known IP
 address to connect to (`wasm.yaml` uses 172.16.0.99), so we add it to the
 loopback interface:
 ```

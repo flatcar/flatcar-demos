@@ -46,7 +46,7 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=KCD example static web server
+        Description=example static web server
         After=docker.service
         Requires=docker.service
         [Service]
