@@ -1,0 +1,24 @@
+variant: flatcar
+version: 1.0.0
+
+storage:
+  files:
+    - path: /opt/extensions/kubernetes/kubernetes.raw
+      mode: 0644
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.30.3-x86-64.raw
+    - path: /etc/flatcar/update.conf
+      overwrite: true
+      contents:
+        inline: |
+          REBOOT_STRATEGY=off
+      mode: 0420
+  links:
+    - target: /opt/extensions/kubernetes/kubernetes.raw
+      path: /etc/extensions/kubernetes.raw
+      hard: false
+
+systemd:
+  units:
+    - name: update-engine.service
+      mask: true
