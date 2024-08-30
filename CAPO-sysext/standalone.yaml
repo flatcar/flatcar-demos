@@ -1,0 +1,43 @@
+variant: flatcar
+version: 1.0.0
+
+storage:
+  links:
+    - target: /opt/extensions/kubernetes/kubernetes-v1.30.1-x86-64.raw
+      path: /etc/extensions/kubernetes.raw
+      hard: false
+  files:
+    - path: /opt/extensions/kubernetes/kubernetes-v1.30.1-x86-64.raw
+      mode: 0644
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.30.1-x86-64.raw
+    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.30.conf
+      mode: 0644
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.30.conf
+    - path: /etc/flatcar/update.conf
+      overwrite: true
+      contents:
+        inline: |
+          REBOOT_STRATEGY=off
+      mode: 0420
+    - path: /etc/sysupdate.d/noop.conf
+      mode: 0644
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: false 
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: kubernetes.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
+    - name: update-engine.service
+      mask: true
