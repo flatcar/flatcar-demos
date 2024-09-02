@@ -1,0 +1,7 @@
+*
+!README.md
+!openstack.env.template
+!.gitignore
+!capo-demo.env
+!kured-dockerhub.yaml
+!standalone.yaml
