@@ -4,8 +4,7 @@ Tools for demo-ing Flatcar deployments on ClusterAPI OpenStack using Kubernetes 
 
 The main demo is implemented in an env file which should be sourced (`capo-demo.env`).
 The env file provides a number of helper functions to set up and run a Flatcar OpenStack deployment.
-It will set up a Kind cluster locally (one node, control plane only) to manage ClusterAPI OpenStack
-worker clusters, then spawn a worker cluster on OpenStack.
+It will set-up a local [management cluster](https://cluster-api.sigs.k8s.io/user/concepts#management-cluster) using Kind to manage [workloads cluster](https://cluster-api.sigs.k8s.io/user/concepts#workload-cluster) deployments on OpenStack.
 
 ## tl;dr
 
