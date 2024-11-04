@@ -1,10 +1,144 @@
 # Cluster API Azure (CAPZ) with Flatcar
 
-This demo is divided into two sections:
-* [Cluster API Azure using Flatcar sysext template](#cluster-api-azure-using-flatcar-sysext-template)
-* Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes)
 
-## Cluster API Azure using Flatcar sysext template
+This demo is divided into three sections:
+* Automated, scripted set-up of a ClusterAPI worker cluster on Azure, including live in-place updates
+* Full manual walk-through of setting up [Cluster API Azure using Flatcar sysext template](#manual-cluster-api-azure-using-flatcar-sysext-template)
+* Full manual walk-through of setting up Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes)
+
+## Automated set-up of a Cluster API demo cluster on Azure
+
+The automation will lead you through all steps necessary for creating an Azure Cluster API cluster from scratch.
+It will also take care of creating a local management cluster, and generally requires very few prerequisites.
+The automation is best suitable if you want to start from scratch, and/or if you need a quick throw-away CAPZ cluster.
+
+**tl;dr**
+
+```bash
+git clone https://github.com/flatcar/flatcar-demos.git
+cd flatcar-demos/CAPZ-sysext
+mkdir demo
+cd demo
+
+cp ../cluster-template-flatcar-sysext.yaml .
+cp ../azure.env.template azure.env
+vim azure.env       # fill in account information
+
+bash -i
+source ../capz-demo.env
+
+get_prerequisites
+setup_kind_cluster
+generate_capz_yaml
+
+deploy_capz_cluster
+
+kc_worker get nodes -o wide
+```
+
+After worker nodes are operational
+```bash
+kc_worker apply -f kured-dockerhub.yaml
+```
+
+Watch the in-place update
+```bash
+watch 'source ../capz-demo.env; kc_worker get nodes -o wide;'
+```
+
+### Prerequisites
+
+An Azure account and an active subscription.
+We will create an RBAC account for use by the Cluster API automation, so you'll need access to the Active Directory of your account.
+
+### Prepare the demo
+
+1. Clone the flatcar-demos repo and change into the "CAPZ-sysext" subdirectory of the repo.
+   ```bash
+   git clone https://github.com/flatcar/flatcar-demos.git
+   cd flatcar-demos/CAPZ-sysext
+   ```
+2. Create a sub-directory `demo` to work in (will be ignored as per the repo's `.gitgnore`).
+   ```bash
+   mkdir demo
+   cd demo
+   ```
+3. Copy the upper directory's `cluster-template-flatcar-sysext.yaml`, and copy `azure.env.template` to `azure.env`:
+   ```bash
+   cp ../cluster-template-flatcar-sysext.yaml .
+   cp ../azure.env.template azure.env
+   ```
+4. Edit `azure.env` and fill in the required variables.
+   Comments in the file will guide you through creating an Active Directory RBAC account to use for the demo if you don't have one available.
+   You can also optionally configure an SSH key to log in to the worker cluster's control plane node.
+
+You should now have:
+- the automation available locally from the flatcar-demos repository you've cloned
+- a `demo` sub-directory with two files in it:
+  - `cluster-template-flatcar-sysext.yaml` which the automation will use to generate the worker cluster configuration from
+  - `azure.env` with data to access the Azure account you want to use for the demo
+
+### Run the demo
+
+The demo will first create a local KIND cluster and install the Cluster API Azure provider.
+It will then generate a cluster configuration for the workload cluster on Azure, and apply it.
+It will wait for the Azure cluster to come up, then give control back to you.
+
+You can interact with the KIND management cluster by using `kc_mgmt <kubectl command>`, and with the workload cluster via `kc_worker <kubectl command>`.
+`kc_mgmt` and `kc_worker` are just wrappers around kubectl with the respective `kubeconfig` set.
+
+1. Start a new shell and source the automation
+   ```bash
+   bash -i
+   source ../capz-demo.env
+   ```
+2. Check prerequisites. This will download `kind` and `helm` for local use.
+   ```bash
+   get_prerequisites
+   ```
+3. Set up the KIND (Kubernetes-IN-Docker") cluster for local use.
+   ```bash
+    setup_kind_cluster
+   ```
+4. Install the Azure provider and generate the Cluster API Azure cluster configuration.
+   ```bash
+   generate_capz_yaml
+   ```
+5. Provision the ClusterAPI Azure workload cluster.
+   This will apply the cluster configuration to the management cluster, which will start the provisioning process on Azure.
+   It will then wait until the cluster is fully provisioned, and install cluster add-ons (Calico and the external cloud provider)
+    to make the cluster operational.
+   Provisioning the cluster can take some time.
+   You can watch the resources being created in the `flatcar-capi-demo-azure` resource group used by the automation in the Azure portal.
+   ```bash
+   deploy_capz_cluster
+   ```
+
+You can now interact with the workload cluster using `kc_worker`, a simple wrapper around `kubectl`.
+
+#### Live in-place Kubernetes updates
+
+The `cluster-template-flatcar-sysext.yaml` shipped with this repo has in-place Kubernetes updates enabled via `systemd-sysupdate`.
+An update should already have been staged on the workload cluster (happens almost immediately after provisioning).
+The `systemd-sysupdate` configuration will also have created a flag file on the node to signal a need for reboot: `/run/reboot-required`.
+
+To demo live in-place Kubernetes updates, all we need to do is to provision KureD to the workload cluster.
+A suitable kured configuration is shipped with the repository.
+
+Run
+```bash
+kc_worker apply -f ../kured-dockerhub.yaml
+```
+to start the process.
+
+KureD will detect the flag file and evacuate and reboot the nodes, one after another.
+You can watch the process:
+```bash
+watch 'source ../capz-demo.env; kc_worker get nodes;'
+```
+
+
+## Manual Cluster API Azure using Flatcar sysext template
 
 In this demo, you will learn how to create a Kubernetes cluster using Azure resources and powered by Flatcar nodes using the systemd-sysext approach. This is inspired from: https://capz.sigs.k8s.io/getting-started
 
@@ -15,6 +149,8 @@ In this demo, you will learn how to create a Kubernetes cluster using Azure reso
 * Azure account with an Azure Service Principal
 * A management cluster (e.g any existing Kubernetes cluster)
 * `clusterctl` and `yq` up-to-date and available in the `$PATH`
+
+Contrary to the automated set-up, which creates a local KIND cluster for management, the below assumes you already run a management cluster.
 
 ### Initialize the management cluster
 
