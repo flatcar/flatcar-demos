@@ -4,7 +4,7 @@
 This demo is divided into three sections:
 * Automated, scripted set-up of a ClusterAPI worker cluster on Azure, including live in-place updates
 * Full manual walk-through of setting up [Cluster API Azure using Flatcar sysext template](#manual-cluster-api-azure-using-flatcar-sysext-template)
-* Full manual walk-through of setting up Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes)
+* Full manual walk-through of setting up Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes) (TBD)
 
 ## Automated set-up of a Cluster API demo cluster on Azure
 
@@ -163,6 +163,7 @@ export AZURE_CLIENT_ID="<AppId>"
 export AZURE_CLIENT_ID_USER_ASSIGNED_IDENTITY=$AZURE_CLIENT_ID # for compatibility with CAPZ v1.16 templates
 export AZURE_CLIENT_SECRET="<Password>"
 export AZURE_RESOURCE_GROUP="capz-demo"
+export AZURE_LOCATION="centralus"
 ```
 
 From now, you can just copy-paste:
@@ -180,6 +181,8 @@ kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-lit
 clusterctl init --infrastructure azure
 ```
 
+### Create the workload cluster
+
 Now, you can generate the workload cluster configuration:
 
 _Notes_:
@@ -187,7 +190,7 @@ _Notes_:
 * Kubernetes version must match sysext-bakery [releases](https://github.com/flatcar/sysext-bakery/releases/tag/latest)
 
 ```bash
-clusterctl generate cluster capi-quickstart \
+clusterctl generate cluster ${AZURE_RESOURCE_GROUP} \
   --infrastructure azure \
   --kubernetes-version v1.31.1 \
   --control-plane-machine-count=3 \
@@ -203,4 +206,14 @@ After a few minutes, the cluster should be available using latest Flatcar versio
 ```bash
 clusterctl get kubeconfig "${AZURE_RESOURCE_GROUP}" > "${AZURE_RESOURCE_GROUP}.kubeconfig"
 kubectl --kubeconfig "${AZURE_RESOURCE_GROUP}.kubeconfig" get nodes -o wide
+```
+
+Of course, the nodes will not be ready while CNI and CCM are not deployed, here's a simple example using Calico:
+```
+# CNI
+export IPV4_CIDR_BLOCK=$(kubectl get cluster "${AZURE_RESOURCE_GROUP}" -o=jsonpath='{.spec.clusterNetwork.pods.cidrBlocks[0]}')
+helm repo add projectcalico https://docs.tigera.io/calico/charts && \
+helm install calico projectcalico/tigera-operator --version v3.26.1 -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --set-string "installation.calicoNetwork.ipPools[0].cidr=${IPV4_CIDR_BLOCK}" --namespace tigera-operator --create-namespace
+# CCM
+helm install --repo https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo cloud-provider-azure --generate-name --set infra.clusterName=${AZURE_RESOURCE_GROUP} --set "cloudControllerManager.clusterCIDR=${IPV4_CIDR_BLOCK}" --set-string "cloudControllerManager.caCertDir=/usr/share/ca-certificates"
 ```
