@@ -1,10 +1,9 @@
 # Cluster API Azure (CAPZ) with Flatcar
 
-
 This demo is divided into three sections:
 * Automated, scripted set-up of a ClusterAPI worker cluster on Azure, including live in-place updates
 * Full manual walk-through of setting up [Cluster API Azure using Flatcar sysext template](#manual-cluster-api-azure-using-flatcar-sysext-template)
-* Full manual walk-through of setting up Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes) (TBD)
+* Full manual walk-through of setting up Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes) (#cluster-api-azure-using-aks-and-flatcar)
 
 ## Automated set-up of a Cluster API demo cluster on Azure
 
@@ -217,3 +216,59 @@ helm install calico projectcalico/tigera-operator --version v3.26.1 -f https://r
 # CCM
 helm install --repo https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo cloud-provider-azure --generate-name --set infra.clusterName=${AZURE_RESOURCE_GROUP} --set "cloudControllerManager.clusterCIDR=${IPV4_CIDR_BLOCK}" --set-string "cloudControllerManager.caCertDir=/usr/share/ca-certificates"
 ```
+
+## Cluster API Azure using AKS and Flatcar
+
+In this demo, you will learn how to create an AKS cluster with Flatcar nodes using the systemd-sysext approach. This is inspired from: https://capz.sigs.k8s.io/managed/managedcluster and https://capz.sigs.k8s.io/managed/managedcluster-join-vmss
+
+### Requirements
+
+:warning: This is done on a fresh Azure account for demo purposes to avoid interfering with any existing components
+
+* Azure account with an Azure Service Principal
+* A management cluster (e.g any existing Kubernetes cluster)
+* `clusterctl` and `yq` up-to-date and available in the `$PATH`
+
+### Initialize the management cluster
+
+We first need to export some variables and create some secrets before initializing the management cluster:
+```bash
+export AZURE_SUBSCRIPTION_ID=a77585be-...
+export AZURE_LOCATION="centralus"
+export EXP_KUBEADM_BOOTSTRAP_FORMAT_IGNITION=true
+export EXP_MACHINE_POOL=true
+export AZURE_TENANT_ID="<Tenant>"
+export AZURE_CLIENT_ID="<AppId>"
+export AZURE_CLIENT_ID_USER_ASSIGNED_IDENTITY=$AZURE_CLIENT_ID # for compatibility with CAPZ v1.16 templates
+export AZURE_CLIENT_SECRET="<Password>"
+export AZURE_RESOURCE_GROUP="capz-demo"
+```
+
+From now, you can just copy-paste:
+```bash
+# Settings needed for AzureClusterIdentity used by the AzureCluster
+export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+export CLUSTER_IDENTITY_NAME="cluster-identity"
+export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Create a secret to include the password of the Service Principal identity created in Azure
+# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}" --namespace "${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}"
+
+# Finally, initialize the management cluster
+clusterctl init --infrastructure azure
+```
+
+Now, you can generate the workload cluster configuration:
+```
+clusterctl generate cluster ${AZURE_RESOURCE_GROUP} \
+  --infrastructure azure \
+  --kubernetes-version v1.31.1 \
+  --control-plane-machine-count=3 \
+  --worker-machine-count=3 \
+  --flavor aks \
+  > "${AZURE_RESOURCE_GROUP}.yaml"
+yq -i "with(. | select(.kind == \"AzureClusterIdentity\"); .spec.type |= \"ServicePrincipal\" | .spec.clientSecret.name |= \"${AZURE_CLUSTER_IDENTITY_SECRET_NAME}\" | .spec.clientSecret.namespace |= \"${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}\")" "${AZURE_RESOURCE_GROUP}.yaml"
+```
+
+To which you can append the following content to set-up Flatcar nodes:
