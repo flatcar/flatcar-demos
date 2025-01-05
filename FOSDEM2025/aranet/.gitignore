@@ -1,0 +1,5 @@
+prometheus-data
+grafana-data
+.uid.env
+.devices.cfg
+*.swp

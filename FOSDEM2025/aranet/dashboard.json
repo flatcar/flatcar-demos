@@ -1,0 +1,1087 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "dateTimeAsIso"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 9,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 20,
+          "valueSize": 25
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "max(aranet4_collector_last_scrape)",
+          "legendFormat": "Last Updated",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "min(aranet4_collector_next_scrape)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Next Update",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Last Scraped",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byType",
+                  "options": "number"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "1000"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 20
+              },
+              {
+                "color": "#EAB839",
+                "value": 40
+              },
+              {
+                "color": "green",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 15,
+        "x": 9,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "aranet4_battery_percent",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "\"{{room}}\" sensor battery",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 3,
+        "x": 0,
+        "y": 2
+      },
+      "id": 9,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<table style=\"width:100%; height:100%;border:0px solid black;\">\n       <td style=\"text-align: center;vertical-align: middle;border:0px solid black; \">\n       <h1 style=\"font-size:50pt\">😷</h1>\n       </td>\n</table>\n\n",
+        "mode": "html"
+      },
+      "pluginVersion": "11.4.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 5000,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 2000
+              },
+              {
+                "color": "red",
+                "value": 3000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 3,
+        "y": 2
+      },
+      "id": 8,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Value$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg(aranet4_co2_ppm)",
+          "instant": true,
+          "legendFormat": "{{room}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 3000,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 59,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 2000
+              },
+              {
+                "color": "red",
+                "value": 3000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 17,
+        "x": 7,
+        "y": 2
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "aranet4_co2_ppm",
+          "legendFormat": "{{room}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 3,
+        "x": 0,
+        "y": 9
+      },
+      "id": 11,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<table style=\"width:100%; height:100%;border:0px solid black;\">\n       <td style=\"text-align: center;vertical-align: middle;border:0px solid black; \">\n       <h1 style=\"font-size:50pt\">🌡️</h1>\n       </td>\n</table>\n\n",
+        "mode": "html"
+      },
+      "pluginVersion": "11.4.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 40,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "super-light-blue",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 18
+              },
+              {
+                "color": "#EAB839",
+                "value": 25
+              },
+              {
+                "color": "dark-red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 3,
+        "y": 9
+      },
+      "id": 10,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Value$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg(aranet4_temperature_c)",
+          "instant": true,
+          "legendFormat": "{{room}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 40,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 24,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "super-light-blue",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 18
+              },
+              {
+                "color": "#EAB839",
+                "value": 25
+              },
+              {
+                "color": "dark-red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 17,
+        "x": 7,
+        "y": 9
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "aranet4_temperature_c",
+          "legendFormat": "{{room}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 16
+      },
+      "id": 12,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<table style=\"width:100%; height:100%;border:0px solid black;\">\n       <td style=\"text-align: center;vertical-align: middle;border:0px solid black; \">\n       <h1 style=\"font-size:50pt\">🌧️</h1>\n       </td>\n</table>\n\n",
+        "mode": "html"
+      },
+      "pluginVersion": "11.4.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#9e9e9e",
+                "value": null
+              },
+              {
+                "color": "#9f9f9fc7",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "#EAB839",
+                "value": 60
+              },
+              {
+                "color": "dark-red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 3,
+        "y": 16
+      },
+      "id": 13,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Value$/",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg(aranet4_humidity_percent)",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "{{room}}",
+          "range": false,
+          "refId": "B"
+        }
+      ],
+      "title": "",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 38,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#9e9e9e",
+                "value": null
+              },
+              {
+                "color": "#9f9f9fc7",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "#EAB839",
+                "value": 60
+              },
+              {
+                "color": "dark-red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 17,
+        "x": 7,
+        "y": 16
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "aranet4_humidity_percent",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{room}}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 22
+      },
+      "id": 15,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<table style=\"width:100%; height:100%;border:0px solid black;\">\n       <td style=\"text-align: center;vertical-align: middle;border:0px solid black; \">\n       <h1 style=\"font-size:50pt\"><br/>⬇️⬇️<br/>➖➖</h1>\n       </td>\n</table>\n\n",
+        "mode": "html"
+      },
+      "pluginVersion": "11.4.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1100,
+          "min": 900,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "super-light-blue",
+                "value": 900
+              },
+              {
+                "color": "green",
+                "value": 950
+              },
+              {
+                "color": "#EAB839",
+                "value": 1000
+              },
+              {
+                "color": "dark-red",
+                "value": 1050
+              }
+            ]
+          },
+          "unit": "pressurehpa"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 3,
+        "y": 22
+      },
+      "id": 14,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg(aranet4_pressure_hpa)",
+          "instant": true,
+          "legendFormat": "{{room}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 1100,
+            "axisSoftMin": 900,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 29,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+               "color": "super-light-blue",
+                "value": 900
+              },
+              {
+                "color": "green",
+                "value": 950
+              },
+              {
+                "color": "#EAB839",
+                "value": 1000
+              },
+              {
+                "color": "dark-red",
+                "value": 1050
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 17,
+        "x": 7,
+        "y": 22
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "aranet4_pressure_hpa",
+          "legendFormat": "{{room}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "1m",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Air Quality",
+  "uid": "ce9957q2zo9a8a",
+  "version": 4,
+  "weekStart": ""
+}
