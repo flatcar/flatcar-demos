@@ -1,0 +1,10 @@
+global:
+  scrape_interval:     10s
+  evaluation_interval: 10s
+
+# A scrape configuration containing exactly one endpoint to scrape.
+scrape_configs:
+  - job_name: 'aranet'
+    scrape_interval: 1m 
+    static_configs:
+      - targets: ['aranet4-exporter:9963']
