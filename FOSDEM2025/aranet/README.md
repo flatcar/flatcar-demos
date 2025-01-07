@@ -37,6 +37,6 @@ In order to change / modify / extend dashboards, you need to log in to Grafana.
 Use the admin username / password defined in `config.env` - defaults are "dashboard" / "dashboard".
 
 After modifying / saving dashboards you may export the updated dashboard's JSON via the "dashboard share" feature.
-Replace the contents of `dashboared.json` in the repository root with the updated JSON to make your modified dashboard the default one.
+Replace the contents of `dashboard.json` in the repository root with the updated JSON to make your modified dashboard the default one.
 
 ![dashboard.png](dashboard.png)
