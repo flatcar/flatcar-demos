@@ -1,0 +1,75 @@
+version: 1.0.0
+variant: flatcar
+storage:
+  links:
+    - target: /opt/extensions/kubernetes/kubernetes-v1.31.3-x86-64.raw
+      path: /etc/extensions/kubernetes.raw
+      hard: false
+  files:
+    - path: /opt/extensions/kubernetes/kubernetes-v1.31.3-x86-64.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.31.3-x86-64.raw
+    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.31.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.31.conf
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+    - path: /etc/systemd/network/00-vmbus.network
+      contents:
+        inline: |
+          [Match]
+          Name=enp0s5
+          [Network]
+          Address=192.168.254.1/24
+    - path: /etc/hostname
+      contents:
+        inline: |
+          controlplane
+
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+      dropins:
+        - name: bootcheck.conf
+          contents: |
+            [Timer]
+            OnBootSec=1min
+            OnUnitActiveSec=10s
+            RandomizedDelaySec=1s
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: kubernetes.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
+
+    - name: kubeadm.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubeadm service
+        Requires=containerd.service
+        After=containerd.service
+        ConditionPathExists=!/etc/kubernetes/kubelet.conf
+        [Service]
+        ExecStartPre=/usr/bin/kubeadm init --control-plane-endpoint=192.168.254.1 --apiserver-cert-extra-sans localhost --apiserver-advertise-address=192.168.254.1 --pod-network-cidr 10.128.0.0/16 --service-cidr 10.129.0.0/16
+        ExecStartPre=/usr/bin/mkdir /home/core/.kube
+        ExecStartPre=/usr/bin/cp /etc/kubernetes/admin.conf /home/core/.kube/config
+        ExecStart=/usr/bin/chown -R core:core /home/core/.kube
+        [Install]
+        WantedBy=multi-user.target
+    - name: kubelet.service
+      dropins:
+        - name: 00-node-ip.conf
+          contents: |
+            [Service]
+            Environment="KUBELET_EXTRA_ARGS=--node-ip 192.168.254.1"
+    - name: update-engine.service
+      mask: true
+    - name: locksmithd.service
+      mask: true
