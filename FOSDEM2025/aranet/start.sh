@@ -3,7 +3,7 @@
 source ./config.env
 
 echo "Ensuring grafana and prometheus data dirs exist and have user ownership"
-mkdir -p prometheus-data grafana-data
+mkdir -p prometheus-data grafana-data aranet-exporter-state
 
 echo "Enabling bluetooth."
 sudo rfkill unblock bluetooth

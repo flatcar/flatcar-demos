@@ -6,8 +6,11 @@ services:
     volumes:
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
       - ./.devices.cfg:/devices.cfg
-    command: /bin/sh -x -c "/aranet4-exporter -interval ${SCRAPE_INTERVAL_SEC} $(cat /devices.cfg)"
+      - ./aranet-exporter-state:/state
+    command: /bin/sh -x -c "/aranet4-exporter -verbose -state /state -interval ${SCRAPE_INTERVAL_SEC} $(cat /devices.cfg)"
     restart: unless-stopped
+    ports:
+      - 19963:9963
 
   prometheus:
     image: prom/prometheus:v3.1.0
