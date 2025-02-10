@@ -31,6 +31,8 @@ get_prerequisites
 setup_kind_cluster
 generate_capz_yaml
 
+patch -p0 ../fix-user-identity.patch
+
 deploy_capz_cluster
 
 kc_worker get nodes -o wide
@@ -63,9 +65,8 @@ We will create an RBAC account for use by the Cluster API automation, so you'll 
    mkdir demo
    cd demo
    ```
-3. Copy the upper directory's `cluster-template-flatcar-sysext.yaml`, and copy `azure.env.template` to `azure.env`:
+3. Copy the upper directory's `azure.env.template` to `azure.env`:
    ```bash
-   cp ../cluster-template-flatcar-sysext.yaml .
    cp ../azure.env.template azure.env
    ```
 4. Edit `azure.env` and fill in the required variables.
@@ -74,9 +75,7 @@ We will create an RBAC account for use by the Cluster API automation, so you'll 
 
 You should now have:
 - the automation available locally from the flatcar-demos repository you've cloned
-- a `demo` sub-directory with two files in it:
-  - `cluster-template-flatcar-sysext.yaml` which the automation will use to generate the worker cluster configuration from
-  - `azure.env` with data to access the Azure account you want to use for the demo
+- a `demo` sub-directory with `azure.env` with data to access the Azure account you want to use for the demo
 
 ### Run the demo
 
@@ -104,7 +103,18 @@ You can interact with the KIND management cluster by using `kc_mgmt <kubectl com
    ```bash
    generate_capz_yaml
    ```
-5. Provision the ClusterAPI Azure workload cluster.
+5. If you want to demo live updates and start systemd-sysupdate by default,
+   apply the following patch to add this to the cluster YAML:
+   ```bash
+    patch -p0 ../enable-updates.patch
+   ```
+6. We need to patch the cluster YAML as the "az ad sp" command in the
+   env template does not create a user identity. This can be skipped when the
+   command has been updated to create the correct rbac.
+   ```bash
+    patch -p0 ../fix-user-identity.patch
+   ```
+7. Provision the ClusterAPI Azure workload cluster.
    This will apply the cluster configuration to the management cluster, which will start the provisioning process on Azure.
    It will then wait until the cluster is fully provisioned, and install cluster add-ons (Calico and the external cloud provider)
     to make the cluster operational.

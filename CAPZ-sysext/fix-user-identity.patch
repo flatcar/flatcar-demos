@@ -1,0 +1,19 @@
+--- flatcar-capi-demo-azure.yaml	2025-02-01 11:31:41.855228667 +0100
++++ flatcar-capi-demo-azure.yaml	2025-02-01 11:30:46.084490156 +0100
+@@ -301,7 +301,6 @@
+         - diskSizeGB: 256
+           lun: 0
+           nameSuffix: etcddisk
+-      identity: UserAssigned
+       image:
+         marketplace:
+           offer: flatcar-container-linux-corevm-amd64
+@@ -312,8 +311,6 @@
+         diskSizeGB: 128
+         osType: Linux
+       sshPublicKey: c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFEb1YvY2tNTnJYUGk2SmhrTkpPbWNpSFJhT2pTemtyL0F0eTZFZDczZVJoRUdZZnQydG9QMEkrK09WampKYTR6cUdMQ0lvTFAyY2dVdm0zYXp1d1ZlNzNvWnVlZkYxMGNGMWJId2FMWUFXSGtERnJ2UldHZWFzWEFNRXVvYVkwUjNsZjdacklqTklSNVNYSmxFWitmMVA4YTRHTDBRMkZxN25EbVNBUVd1ZGxicGpqdDVpcU1hVHp1SmdlMGVXTGV3TXZwNG5hMlFKMEl4UWJleVh6Wkw5Rms0YWhCWklkMEtSSlU3NXZUclgwQ2JOU3QyazNzdFVWU1pCSmFYUWdFU2UvSmdadmtkU3dMODlyOEdmZGppd3BNeWdEOW40dWU4SnVwSC9yclMybmdud1FrUlZSNUpPNW1pbmNtTHVkOXJpRXFEbTVrMFY0aGtkZVJRMEtuaWwgdGhpbG9AUmViZWNjYQo=
+-      userAssignedIdentities:
+-        - providerID: /subscriptions/16913f24-3e3d-4df8-a29a-7670282e2c44/resourceGroups/flatcar-capi-demo-azure/providers/Microsoft.ManagedIdentity/userAssignedIdentities/cloud-provider-user-identity
+       vmSize: Standard_D2s_v3
+ ---
+ apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
