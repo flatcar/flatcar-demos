@@ -1,0 +1,43 @@
+--- flatcar-capi-demo-azure.yaml	2025-01-30 18:08:27.400512798 +0100
++++ flatcar-capi-demo-azure.yaml	2025-01-30 19:00:26.477006696 +0100
+@@ -56,9 +56,14 @@
+                 # NOTE: To coordinate the node reboot in this context, we recommend to use Kured.
+                 mask: true
+               - name: systemd-sysupdate.timer
+-                # Set this to 'true' if you want to enable the Kubernetes auto-update.
+-                # NOTE: Only patches version will be pulled.
+-                enabled: false
++                enabled: true
++                dropins:
++                  - name: bootcheck.conf
++                    contents: |
++                      [Timer]
++                      OnBootSec=1min
++                      OnUnitActiveSec=10s
++                      RandomizedDelaySec=1s
+               - name: kubeadm.service
+                 dropins:
+                 - name: 10-flatcar.conf
+@@ -177,13 +182,18 @@
+             - name: update-engine.service
+               # Set this to 'false' if you want to enable Flatcar auto-update
+               mask: true
++            - name: systemd-sysupdate.timer
++              enabled: true
++              dropins:
++                - name: bootcheck.conf
++                  contents: |
++                    [Timer]
++                    OnBootSec=1min
++                    OnUnitActiveSec=10s
++                    RandomizedDelaySec=1s
+             - name: locksmithd.service
+               # NOTE: To coordinate the node reboot in this context, we recommend to use Kured.
+               mask: true
+-            - name: systemd-sysupdate.timer
+-              # Set this to 'true' if you want to enable the Kubernetes auto-update.
+-              # NOTE: Only patches version will be pulled.
+-              enabled: false
+             - name: kubeadm.service
+               dropins:
+               - name: 10-flatcar.conf
