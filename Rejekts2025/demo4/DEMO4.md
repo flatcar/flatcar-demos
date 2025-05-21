@@ -56,7 +56,7 @@ deploy_capz_cluster
 kc_worker get nodes
 ```
 
-When worker nodes are operational, iniate update
+When worker nodes are operational, initiate update
 ```bash
 kc_worker apply -f kured-dockerhub.yaml
 ```

@@ -32,7 +32,7 @@ cat SHA256SUMS
 ```
 
 Now start sysupdate manually.
-This is usually being done by the timer unit, but we diabled that.
+This is usually being done by the timer unit, but we disabled that.
 ```bash
 journalctl -u systemd-sysupdate --no-pager
 systemctl start systemd-sysupdate
