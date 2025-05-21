@@ -1,0 +1,12 @@
+variant: flatcar
+version: 1.0.0
+
+storage:
+  files:
+    - path: /opt/extensions/kubernetes/kubernetes-v1.31.0-x86-64.raw
+      contents:
+        source: http://172.20.0.99:8000/kubernetes-v1.31.0-x86-64.raw
+systemd:
+  units:
+    - name: update-engine.service
+      mask: true
