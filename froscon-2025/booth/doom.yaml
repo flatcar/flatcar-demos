@@ -1,0 +1,31 @@
+variant: flatcar
+version: 1.0.0
+
+passwd:
+  users:
+    - name: caddy
+      no_create_home: true
+      groups: [ docker ]
+
+systemd:
+  units:
+    - name: update-engine.service
+      mask: true
+    - name: doom.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Doom JS
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        User=caddy
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm --force doom
+        ExecStart=/usr/bin/docker run -i -p 8000:8000 --name doom \
+                        hub.aachalon.net/doom:latest
+        ExecStop=/usr/bin/docker stop doom
+        Restart=always
+        RestartSec=5s
+        [Install]
+        WantedBy=multi-user.target

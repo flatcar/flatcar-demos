@@ -1,0 +1,68 @@
+variant: flatcar
+version: 1.0.0
+
+passwd:
+  users:
+    - name: caddy
+      no_create_home: true
+      groups: [ docker ]
+
+storage:
+  files:
+    - path: /srv/www/html/index.html
+      mode: 0644
+      user:
+        name: caddy
+      group:
+        name: caddy
+      contents:
+        inline: |
+          <html><body align="center">
+          <div style="width:100%;text-align:center;">
+          <img align="center" src="froscon_logo_print_color.png" alt="FrOSCon logo" width="500px" />
+          <h1>Hello FrOSCon!</h1>
+          <video autoplay="true" muted="" loop="true" preload="none" data-src="hero-video.mp4"
+            data-type="video/mp4" src="hero-video.mp4" width="1200px" align="center" >
+            <source src="hero-video.mp4" type="video/mp4"></video>
+          </div></body></html>
+    - path: /srv/www/html/froscon_logo_print_color.png
+      mode: 0644
+      user:
+        name: caddy
+      group:
+        name: caddy
+      contents:
+        local: froscon_logo_print_color.png
+    - path: /srv/www/html/hero-video.mp4
+      mode: 0644
+      user:
+        name: caddy
+      group:
+        name: caddy
+      contents:
+        source: https://www.flatcar.org/videos/hero-video.mp4
+
+systemd:
+  units:
+    - name: update-engine.service
+      mask: true
+    - name: demo-webserver.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=KCD example static web server
+        After=docker.service
+        Requires=docker.service
+        [Service]
+        User=caddy
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker rm --force caddy
+        ExecStart=/usr/bin/docker run -i -p 80:80 --name caddy \
+                  -v /srv/www/html:/usr/share/caddy \
+                  docker.io/caddy caddy file-server \
+                  --root /usr/share/caddy --access-log
+        ExecStop=/usr/bin/docker stop caddy
+        Restart=always
+        RestartSec=5s
+        [Install]
+        WantedBy=multi-user.target
