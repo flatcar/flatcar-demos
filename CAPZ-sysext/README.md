@@ -1,10 +1,9 @@
 # Cluster API Azure (CAPZ) with Flatcar
 
-
 This demo is divided into three sections:
 * Automated, scripted set-up of a ClusterAPI worker cluster on Azure, including live in-place updates
 * Full manual walk-through of setting up [Cluster API Azure using Flatcar sysext template](#manual-cluster-api-azure-using-flatcar-sysext-template)
-* Full manual walk-through of setting up Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes) (TBD)
+* Full manual walk-through of setting up [Cluster API Azure using AKS (mixing Ubuntu and Flatcar nodes)](#cluster-api-azure-using-aks-and-flatcar)
 
 ## Automated set-up of a Cluster API demo cluster on Azure
 
@@ -200,9 +199,10 @@ _Notes_:
 * Kubernetes version must match sysext-bakery [releases](https://github.com/flatcar/sysext-bakery/releases/tag/latest)
 
 ```bash
-clusterctl generate cluster ${AZURE_RESOURCE_GROUP} \
+export KUBERNETES_VERSION=v1.31.1
+clusterctl generate cluster "${AZURE_RESOURCE_GROUP}" \
   --infrastructure azure \
-  --kubernetes-version v1.31.1 \
+  --kubernetes-version "${KUBERNETES_VERSION}" \
   --control-plane-machine-count=3 \
   --worker-machine-count=3 \
   --flavor flatcar-sysext \
@@ -226,4 +226,220 @@ helm repo add projectcalico https://docs.tigera.io/calico/charts && \
 helm install calico projectcalico/tigera-operator --version v3.26.1 -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --set-string "installation.calicoNetwork.ipPools[0].cidr=${IPV4_CIDR_BLOCK}" --namespace tigera-operator --create-namespace
 # CCM
 helm install --repo https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo cloud-provider-azure --generate-name --set infra.clusterName=${AZURE_RESOURCE_GROUP} --set "cloudControllerManager.clusterCIDR=${IPV4_CIDR_BLOCK}" --set-string "cloudControllerManager.caCertDir=/usr/share/ca-certificates"
+```
+
+## Cluster API Azure using AKS and Flatcar
+
+In this demo, you will learn how to create an AKS cluster with Flatcar nodes using the systemd-sysext approach. This is inspired from: https://capz.sigs.k8s.io/managed/managedcluster and https://capz.sigs.k8s.io/managed/managedcluster-join-vmss
+
+### Requirements
+
+:warning: This is done on a fresh Azure account for demo purposes to avoid interfering with any existing components
+
+* Azure account with an Azure Service Principal
+* A management cluster (e.g any existing Kubernetes cluster)
+* `clusterctl` and `yq` up-to-date and available in the `$PATH`
+
+### Initialize the management cluster
+
+We first need to export some variables and create some secrets before initializing the management cluster:
+```bash
+export AZURE_SUBSCRIPTION_ID=a77585be-...
+export AZURE_LOCATION="centralus"
+export EXP_KUBEADM_BOOTSTRAP_FORMAT_IGNITION=true
+export EXP_MACHINE_POOL=true
+export AZURE_TENANT_ID="<Tenant>"
+export AZURE_CLIENT_ID="<AppId>"
+export AZURE_CLIENT_ID_USER_ASSIGNED_IDENTITY=$AZURE_CLIENT_ID # for compatibility with CAPZ v1.16 templates
+export AZURE_CLIENT_SECRET="<Password>"
+export AZURE_RESOURCE_GROUP="capz-demo"
+```
+
+From now, you can just copy-paste:
+```bash
+# Settings needed for AzureClusterIdentity used by the AzureCluster
+export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+export CLUSTER_IDENTITY_NAME="cluster-identity"
+export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Create a secret to include the password of the Service Principal identity created in Azure
+# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}" --namespace "${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}"
+
+# Finally, initialize the management cluster
+clusterctl init --infrastructure azure
+```
+
+Now, you can generate the workload cluster configuration:
+```
+export KUBERNETES_VERSION=v1.31.1
+clusterctl generate cluster ${AZURE_RESOURCE_GROUP} \
+  --infrastructure azure \
+  --kubernetes-version "${KUBERNETES_VERSION}" \
+  --control-plane-machine-count=1 \
+  --worker-machine-count=1 \
+  --flavor aks \
+  > "${AZURE_RESOURCE_GROUP}.yaml"
+yq -i "with(. | select(.kind == \"AzureClusterIdentity\"); .spec.type |= \"ServicePrincipal\" | .spec.clientSecret.name |= \"${AZURE_CLUSTER_IDENTITY_SECRET_NAME}\" | .spec.clientSecret.namespace |= \"${AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE}\")" "${AZURE_RESOURCE_GROUP}.yaml"
+```
+
+To which you can append the following content to set-up Flatcar nodes:
+```yaml
+cat << EOF >> "${AZURE_RESOURCE_GROUP}.yaml"
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: ${AZURE_RESOURCE_GROUP}-vmss
+  namespace: default
+spec:
+  clusterName: ${AZURE_RESOURCE_GROUP}
+  replicas: 1
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfig
+          name: ${AZURE_RESOURCE_GROUP}-vmss
+      clusterName: ${AZURE_RESOURCE_GROUP}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureMachinePool
+        name: ${AZURE_RESOURCE_GROUP}-vmss
+      version: ${KUBERNETES_VERSION}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureMachinePool
+metadata:
+  name: ${AZURE_RESOURCE_GROUP}-vmss
+  namespace: default
+spec:
+  location: centralus
+  strategy:
+    rollingUpdate:
+      deletePolicy: Oldest
+      maxSurge: 25%
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    image:
+      marketplace:
+        version: latest
+        publisher: kinvolk
+        offer: flatcar-container-linux-corevm-amd64
+        sku: stable-gen2
+    osDisk:
+      diskSizeGB: 30
+      osType: Linux
+    vmSize: Standard_D2s_v3
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfig
+metadata:
+  name: ${AZURE_RESOURCE_GROUP}-vmss
+  namespace: default
+spec:
+  files:
+  - contentFrom:
+      secret:
+        key: worker-node-azure.json
+        name: ${AZURE_RESOURCE_GROUP}-vmss-azure-json
+    owner: root:root
+    path: /etc/kubernetes/azure.json
+    permissions: "0644"
+  - contentFrom:
+      secret:
+        key: value
+        name: ${AZURE_RESOURCE_GROUP}-kubeconfig
+    owner: root:root
+    path: /etc/kubernetes/admin.conf
+    permissions: "0644"
+  joinConfiguration:
+    discovery:
+      file:
+        kubeConfigPath: /etc/kubernetes/admin.conf
+    nodeRegistration:
+      kubeletExtraArgs:
+        cloud-provider: external
+      name: "@@HOSTNAME@@"
+  format: ignition
+  ignition:
+    containerLinuxConfig:
+      additionalConfig: |
+        storage:
+          links:
+          - path: /etc/extensions/kubernetes.raw
+            hard: false
+            target: /opt/extensions/kubernetes/kubernetes-${KUBERNETES_VERSION}-x86-64.raw
+          files:
+          - path: /etc/sysupdate.kubernetes.d/kubernetes-${KUBERNETES_VERSION%.*}.conf
+            mode: 0644
+            contents:
+              remote:
+                url: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-${KUBERNETES_VERSION%.*}.conf
+          - path: /etc/sysupdate.d/noop.conf
+            mode: 0644
+            contents:
+              remote:
+                url: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+          - path: /opt/extensions/kubernetes/kubernetes-${KUBERNETES_VERSION}-x86-64.raw
+            contents:
+              remote:
+                url: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-${KUBERNETES_VERSION}-x86-64.raw
+        systemd:
+          units:
+          - name: systemd-sysupdate.service
+            dropins:
+              - name: kubernetes.conf
+                contents: |
+                  [Service]
+                  ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
+                  ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+                  ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
+                  ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
+          - name: update-engine.service
+            # Set this to 'false' if you want to enable Flatcar auto-update
+            mask: true
+          - name: locksmithd.service
+            # NOTE: To coordinate the node reboot in this context, we recommend to use Kured.
+            mask: true
+          - name: systemd-sysupdate.timer
+            # Set this to 'true' if you want to enable the Kubernetes auto-update.
+            # NOTE: Only patches version will be pulled.
+            enabled: false
+          - name: kubeadm.service
+            dropins:
+            - name: 10-flatcar.conf
+              contents: |
+                [Unit]
+                After=oem-cloudinit.service
+                # kubeadm must run after containerd - see https://github.com/kubernetes-sigs/image-builder/issues/939.
+                After=containerd.service
+  preKubeadmCommands:
+  - sed -i "s/@@HOSTNAME@@/\$(curl -s -H Metadata:true --noproxy '*' 'http://169.254.169.254/metadata/instance?api-version=2020-09-01'| jq -r .compute.osProfile.computerName)/g" /etc/kubeadm.yml
+  - kubeadm init phase upload-config all &
+EOF
+```
+
+It is now the time to apply the configuration:
+```bash
+kubectl apply -f "${AZURE_RESOURCE_GROUP}.yaml"
+```
+
+After a few minutes, the AKS cluster should be available and one node pool should be powered by latest Flatcar version available on the Azure marketplace.
+
+```bash
+clusterctl get kubeconfig "${AZURE_RESOURCE_GROUP}" > "${AZURE_RESOURCE_GROUP}.kubeconfig"
+kubectl --kubeconfig "./${AZURE_RESOURCE_GROUP}.kubeconfig" get nodes -o wide
+```
+
+It is now the time to link the Flatcar node to the AKS cluster:
+```bash
+kubectl --kubeconfig "./${AZURE_RESOURCE_GROUP}.kubeconfig" label node "${AZURE_RESOURCE_GROUP}-vmss000000" "kubernetes.azure.com/cluster=MC_${AZURE_RESOURCE_GROUP}_${AZURE_RESOURCE_GROUP}_${AZURE_LOCATION}"
+```
+
+And to deploy Azure CNI:
+```bash
+kubectl --kubeconfig "./${AZURE_RESOURCE_GROUP}.kubeconfig" apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/azure-cni-v1.yaml
 ```
