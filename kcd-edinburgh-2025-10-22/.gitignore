@@ -1,0 +1,14 @@
+/demo_*/*.json
+/demo_*/flatcar-vm/*/
+/demo_*/webserver/*
+/demo_3/token.conf
+/demo_4/azure.env
+/demo_4/*.helm-registry.lock
+/demo_4/*.helm-registry.yaml
+/demo_4/*.kubeconfig
+/demo_4/clusterctl
+/demo_4/flatcar-capi-demo-azure.yaml
+/demo_4/helm
+/demo_4/helm-cache/
+/demo_4/kind
+/demo_4/kind-mgmt.kubeconfig

@@ -1,0 +1,16 @@
+#!/bin/bash -ex
+
+PORT=5000
+cd "$(dirname $(realpath -e "$0"))"
+
+docker start zot-k8s || docker run --detach -p "${PORT}:${PORT}" -v "${PWD}":/etc/zot --name zot-k8s --pull always ghcr.io/project-zot/zot-linux-amd64:latest
+
+for IMAGE in \
+    registry.k8s.io/coredns/coredns:v1.12.0 \
+    registry.k8s.io/etcd:3.5.21-0 \
+    registry.k8s.io/pause:3.10 \
+    registry.k8s.io/kube-{apiserver,controller-manager,proxy,scheduler}:v1.33.{0,5} \
+    docker.io/calico/{cni,node,kube-controllers}:v3.24.1 \
+; do
+    skopeo copy --dest-cert-dir cert "docker://${IMAGE}" "docker://127.0.0.1:${PORT}/${IMAGE#*/}"
+done
