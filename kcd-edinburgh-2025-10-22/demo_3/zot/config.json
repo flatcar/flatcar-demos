@@ -1,0 +1,31 @@
+{
+    "storage":{
+        "rootDirectory": "/var/lib/registry"
+    },
+    "http":{
+        "compat": ["docker2s2"],
+        "address": "0.0.0.0",
+        "port": "5000",
+        "tls": {
+            "cert": "/etc/zot/cert/zot.crt",
+            "key": "/etc/zot/zot.key"
+        }
+    },
+    "log":{
+        "level": "debug"
+    },
+    "extensions": {
+        "search": {
+            "enable": false,
+            "cve": {
+                "updateInterval": "2h"
+            }
+        },
+        "ui": {
+            "enable": false
+        },
+        "mgmt": {
+            "enable": false
+        }
+    }
+}

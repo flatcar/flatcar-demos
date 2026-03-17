@@ -1,0 +1,7 @@
+[Mount]
+What=demo
+Where=/mnt
+Type=virtiofs
+
+[Install]
+WantedBy=local-fs.target
