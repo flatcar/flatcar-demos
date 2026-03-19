@@ -1,0 +1,9 @@
+digest.sha512
+flatcar_production_qemu_uefi_efi_code.qcow2
+flatcar_production_qemu_uefi_efi_vars.qcow2
+flatcar_production_qemu_uefi_image.img
+flatcar_production_qemu_uefi_image.img.bz2.DIGESTS.asc
+flatcar_production_qemu_uefi.sh
+kubeconfig
+*.yaml
+*.json
