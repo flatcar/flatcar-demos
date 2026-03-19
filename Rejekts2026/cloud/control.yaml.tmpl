@@ -1,0 +1,71 @@
+version: 1.0.0
+variant: flatcar
+
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - {SSH_KEY}
+
+storage:
+  links:
+    - target: /opt/extensions/kubernetes/kubernetes-v1.35.0-x86-64.raw
+      path: /etc/extensions/kubernetes.raw
+      hard: false
+  files:
+    - path: /opt/extensions/kubernetes/kubernetes-v1.35.0-x86-64.raw
+      contents:
+        source: https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.35.0-x86-64.raw
+    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.35.conf
+      contents:
+        source: https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.35.conf
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://extensions.flatcar.org/extensions/noop.conf
+
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+      dropins:
+        - name: bootcheck.conf
+          contents: |
+            [Timer]
+            OnBootSec=1min
+            OnUnitActiveSec=10s
+            RandomizedDelaySec=1s
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: kubernetes.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
+
+    - name: kubeadm.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubeadm service
+        Requires=containerd.service
+        After=containerd.service
+        ConditionPathExists=!/etc/kubernetes/kubelet.conf
+        [Service]
+        ExecStartPre=/usr/bin/kubeadm init
+        ExecStartPre=/usr/bin/mkdir /home/core/.kube
+        ExecStartPre=/usr/bin/cp /etc/kubernetes/admin.conf /home/core/.kube/config
+        ExecStart=/usr/bin/chown -R core:core /home/core/.kube
+        [Install]
+        WantedBy=multi-user.target
+      dropins:
+        - name: more-time.conf
+          contents: |
+            [Service]
+            TimeoutStartSec=infinity
+    - name: kubelet.service
+    - name: update-engine.service
+      mask: true
+    - name: locksmithd.service
+      mask: true
