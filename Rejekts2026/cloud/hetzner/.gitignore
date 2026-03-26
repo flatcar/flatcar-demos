@@ -1,0 +1,5 @@
+IDs
+control.*
+kubeconfig
+worker*.yaml
+worker*.json
