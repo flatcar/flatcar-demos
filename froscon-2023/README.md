@@ -146,6 +146,7 @@ While we bake our first image, let's cover some development basics.
 * `./` - mostly low-level build scripts for use inside of the SDK container. Also, SDK container wrapper scripts.
 * `sdk_container/` - helper scripts for the SDK container as well as all package ebuilds
 * `ci-automation/` - glue logic scripts for building and testing Flatcar in a CI
+* `manifests/` - holds version information of the distro
 
 **Where are the ebuilds?**
 ```
@@ -181,9 +182,10 @@ We'll import ebuilds from Gentoo.
 
 **Flatcar release version**
 ```
-cat sdk_container/.repo/manifests/version.txt
+cat manifests/version.txt
 ```
 This version file determines (among other things) which SDK container release is started by `run_sdk_container`.
+Note that in older checkouts of scripts repository, the version file may still be located in `sdk_container/.repo/manifests/version.txt` instead.
 
 ### The SDK container and the wrapper script
 
