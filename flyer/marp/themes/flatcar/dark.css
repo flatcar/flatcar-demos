@@ -1,0 +1,298 @@
+/* @theme flatcar-dark
+ *
+ * Dark navy layouts: `lead`, `cover`, `section`, `closing`, `quote`.
+ * Shared base rules at top; per-layout positioning blocks below.
+ * Imported by the main `flatcar` theme.
+ */
+
+/* ---------------- SHARED: NAVY LAYOUTS ----------------
+ * Everything identical across the dark layouts goes here.
+ * Note: write as `section:is(.foo, .bar)` (no space, no nested `section`)
+ * because Marpit auto-prefixes selectors that don't start with `section`. */
+section:is(.lead, .cover, .section, .closing, .quote) {
+  background: var(--bg-navy);
+  color: var(--paper);
+}
+
+/* Suppress the top title bar, these layouts position h1 themselves. */
+section:is(.lead, .cover, .section, .closing) h1 {
+  position: static;
+  background: transparent;
+  background-image: none;
+}
+
+/* Text accents on navy: bold = white, links = cyan, pagination = dim white. */
+section:is(.lead, .cover, .section, .closing, .quote) strong {
+  color: var(--paper);
+  font-weight: 600;
+}
+section:is(.lead, .cover, .section, .closing, .quote) a {
+  color: var(--accent-cyan);
+}
+section:is(.lead, .cover, .section, .closing, .quote)::after {
+  color: rgba(255,255,255,0.35);
+}
+
+/* Inline code on navy: drop the light pill, blend with surrounding text. */
+section:is(.lead, .cover, .section, .closing, .quote) code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* ---------------- LEAD ---------------- */
+section.lead {
+  padding: 70px;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+section.lead h1 {
+  margin: 0 0 18px 0;
+  padding: 0;
+  color: var(--accent-cyan);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+section.lead h2 {
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 28px;
+  margin: 0 0 36px 0;
+}
+
+/* ---------------- COVER ---------------- */
+section.cover {
+  /* Staircase artwork bleeding off bottom-right. */
+  background-image: url('assets/backgrounds/flatcar-staircase-right.svg');
+  background-repeat: no-repeat;
+  background-position: right -60px bottom -588px;
+  background-size: 75% auto;
+  padding: 80px 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+section.cover h1 {
+  background-image: url('assets/logos/flatcar-logotype/icon/color/flatcar-icon-color.svg');
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 110px auto;
+  margin: 0 0 auto 0;
+  padding: 140px 0 0 0;
+  color: var(--accent-cyan);
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  /* Keep title clear of the staircase art at bottom-right. */
+  max-width: 60%;
+}
+section.cover h2 {
+  margin: 24px 0 auto 0;
+  padding: 0;
+  color: var(--paper);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+  max-width: 60%;
+}
+section.cover p {
+  margin: 0;
+  padding-bottom: 30px;
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--paper);
+}
+
+/* ---------------- SECTION (divider) ---------------- */
+section.section {
+  background-image: url('assets/backgrounds/flatcar-staircase-right.svg');
+  background-repeat: no-repeat;
+  background-position: right -60px bottom -588px;
+  background-size: 75% auto;
+  padding: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+section.section h1 {
+  margin: 0 0 18px 0;
+  padding: 0;
+  color: var(--accent-cyan);
+  font-size: 52px;
+  font-weight: 700;
+}
+section.section h2 {
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 26px;
+  margin: 0;
+}
+
+/* ---------------- CLOSING ---------------- */
+section.closing {
+  /* Flatcar logo top-left, QR code top-right. */
+  background-image:
+    url('assets/flatcar-logo.svg'),
+    url('assets/qr-code.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position:
+    70px 50px,
+    right 60px top 50px;
+  background-size:
+    130px auto,
+    260px 260px;
+  padding: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+/* Caption under the QR, CTA to the Flatcar Discord server. */
+section.closing p.closing-qr-caption {
+  position: absolute;
+  top: 325px;
+  right: 60px;
+  width: 260px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--accent-cyan);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+section.closing p.closing-qr-caption img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  margin: 0;
+}
+section.closing h1 {
+  margin: 0 0 24px 0;
+  padding: 0;
+  color: var(--paper);
+  font-size: 64px;
+  font-weight: 700;
+}
+section.closing h2 {
+  margin: 0 0 24px 0;
+  padding: 0;
+  color: var(--accent-cyan);
+  font-size: 26px;
+  font-weight: 600;
+}
+section.closing p.closing-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 18px 0;
+  padding: 0;
+  color: var(--paper);
+  font-size: 24px;
+  font-weight: 500;
+}
+section.closing p.closing-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--paper);
+  text-decoration: none;
+}
+section.closing p.closing-links a:hover { color: var(--accent-cyan); }
+section.closing p.closing-links img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin: 0;
+}
+section.closing p.closing-meetings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  margin: 6px 0 20px 0;
+  padding: 14px 20px;
+  border-left: 4px solid var(--accent-cyan);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 0 6px 6px 0;
+  color: var(--paper);
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+section.closing p.closing-meetings strong {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+section.closing p.closing-cta {
+  margin: 0;
+  padding: 0;
+  max-width: 780px;
+  color: var(--paper);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+section.closing p.closing-cta strong {
+  color: var(--accent-cyan);
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* ---------------- QUOTE ---------------- */
+section.quote {
+  padding: 80px 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+section.quote blockquote {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 36px;
+  border: none;
+  background: transparent;
+  color: var(--paper);
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1.5;
+  font-style: italic;
+}
+section.quote blockquote::before {
+  content: '\201C';
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  font-size: 96px;
+  line-height: 1;
+  color: var(--accent-cyan);
+  font-style: normal;
+  font-weight: 700;
+}
+section.quote ul {
+  list-style: none;
+  margin: 32px 0 0 36px;
+  padding: 0;
+}
+section.quote li {
+  color: var(--muted);
+  font-size: 22px;
+  font-weight: 400;
+  font-style: normal;
+  margin: 0;
+}
+section.quote li::before { content: '\2014\00A0'; color: var(--accent-cyan); }
+section.quote li::marker { display: none; color: transparent; }

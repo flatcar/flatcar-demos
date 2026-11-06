@@ -1,0 +1,451 @@
+/* @theme flatcar-base
+ *
+ * Palette + default content slide (white background, navy title bar
+ * with Flatcar logo, body text). Imported by the main `flatcar`
+ * theme, not intended to be used standalone.
+ */
+
+:root {
+  --bg-navy:     #12172B;
+  --accent-cyan: #09BAC8;
+  --ink:         #12172B;
+  --paper:       #FFFFFF;
+  --muted:       #7A87A0;
+}
+
+section {
+  font-family: 'Overpass', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 124px 70px 70px 70px;
+  font-size: 32px;
+  line-height: 1.45;
+  justify-content: flex-start;
+  align-items: stretch;
+  position: relative;
+}
+
+/* Default top title bar, overridden to position:static by every
+ * non-default layout in `dark.css` / `sidebar.css`. */
+section h1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-navy);
+  color: var(--accent-cyan);
+  margin: 0;
+  /* Overpass sits high in its line box: nudge the text down so it is
+   * optically centred in the bar (same height, 0.14em shift). */
+  padding: calc(22px + 0.14em) 70px calc(22px - 0.14em);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background-image: url('assets/flatcar-logo.svg');
+  background-repeat: no-repeat;
+  background-position: right 28px center;
+  background-size: 120px 120px;
+}
+
+section h2 {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 32px;
+  margin-top: 0;
+}
+
+section ul, section ol { padding-left: 1.2em; }
+section li { margin: 0.25em 0; }
+section li::marker { color: var(--accent-cyan); }
+
+section strong { color: var(--ink); font-weight: 600; }
+section a      { color: var(--accent-cyan); text-decoration: none; }
+
+section table { border-collapse: collapse; margin: 0.6em 0; }
+section th, section td {
+  border: none;
+  padding: 8px 16px 8px 0;
+  vertical-align: top;
+}
+section th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9em;
+  text-align: left;
+  border-bottom: 1px solid var(--accent-cyan);
+}
+
+section code {
+  font-family: 'Cascadia Mono', 'Cascadia Code', ui-monospace, Menlo, Consolas,
+               'DejaVu Sans Mono', 'Liberation Mono', monospace;
+  font-weight: 500;
+  background: #F1F2F6;
+  color: var(--ink);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.95em;
+}
+section pre {
+  background: #F1F2F6;
+  border-left: 4px solid var(--accent-cyan);
+  padding: 16px 20px;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+section pre code { background: none; padding: 0; font-weight: 500; }
+
+/* highlight.js token colors (Flatcar palette), works for any
+ * language Marp CLI can detect: ```cpp, ```python, ```rust,
+ * ```go, ```yaml, ```json, ```bash, ```typescript, etc. */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class    { color: #0077A8; font-weight: 600; }
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-regexp,
+.hljs-addition          { color: #12766A; }
+.hljs-number,
+.hljs-quote,
+.hljs-template-variable { color: #9A3F00; }
+.hljs-comment,
+.hljs-meta,
+.hljs-deletion          { color: #5B6773; font-style: italic; }
+.hljs-built_in,
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-title.class_,
+.hljs-title             { color: var(--ink); font-weight: 700; }
+.hljs-attr,
+.hljs-attribute,
+.hljs-variable,
+.hljs-params            { color: #0077A8; }
+.hljs-emphasis          { font-style: italic; }
+.hljs-strong            { font-weight: 700; }
+
+section::after  { color: var(--muted); font-size: 14px; font-weight: 400; }
+section footer  { color: var(--muted); font-size: 13px; bottom: 22px; left: 70px; }
+
+/* ============================================================
+ * UTILITIES
+ * ------------------------------------------------------------
+ * Reusable helper classes. Two ways to apply them:
+ *
+ *   1. HTML/CSS class syntax (works on any element):
+ *        <img class="img-md center" src="…">
+ *        <div class="row row-center">…</div>
+ *
+ *   2. Markdown alt-text tokens (images only):
+ *        ![img-md center](assets/logo.png)
+ *        ![pin-br img-sm](assets/logo.png)
+ *
+ *   Both hit the SAME rules, the CSS matches the class or a
+ *   whitespace-separated word in the img's alt attribute:
+ *        .center, img[alt~="center"] { … }
+ *
+ *   Marp accepts raw HTML because `markdown.marp.enableHtml` /
+ *   `--html` is enabled.
+ *
+ * Naming convention:
+ *   .text-*        text alignment
+ *   .muted / .small / .big / .upper   text style
+ *   .badge*        inline pills
+ *   .img-*         image sizing
+ *   .center / .left / .right          block alignment
+ *   .row / .col / .cols-*             flex + grid containers
+ *   .pin-*         pin to a slide edge/corner (absolute, any layout)
+ *   .pane-*        same but inside a sidebar/agenda pane
+ *                  (see themes/flatcar/sidebar.css)
+ *   .callout*      boxed note blocks
+ * ============================================================ */
+
+/* ---------- Text alignment ---------- */
+.text-left   { text-align: left; }
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+/* ---------- Text style ---------- */
+.muted { color: var(--muted); }
+.small { font-size: 0.8em; }
+.big   { font-size: 1.4em; }
+.upper { text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ---------- Inline badges / pills ----------
+ * <span class="badge">CNCF</span>
+ * <span class="badge badge-cyan">v4.1</span> */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #F1F2F6;
+  color: var(--ink);
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+.badge-cyan  { background: var(--accent-cyan); color: var(--paper); }
+.badge-navy  { background: var(--bg-navy);     color: var(--paper); }
+.badge-muted { background: transparent; color: var(--muted); border: 1px solid var(--muted); }
+
+/* ---------- Image sizing ----------
+ * Use on <img> directly (class or alt-text). Combine with an
+ * alignment class: <img class="img-md center"> or ![img-md center](…)
+ *
+ * Three families:
+ *   img-*      set width, height auto-scales
+ *   img-h-*    set height, width auto-scales
+ *   img-sq-*   set both to the same value (square) + object-fit:cover
+ *              so portraits/avatars crop nicely instead of stretching */
+
+/* Width scale (height stays proportional) */
+.img-2xs,  img[alt~="img-2xs"]  { width: 48px;  height: auto; }
+.img-xs,   img[alt~="img-xs"]   { width: 80px;  height: auto; }
+.img-sm,   img[alt~="img-sm"]   { width: 160px; height: auto; }
+.img-md,   img[alt~="img-md"]   { width: 320px; height: auto; }
+.img-lg,   img[alt~="img-lg"]   { width: 560px; height: auto; }
+.img-xl,   img[alt~="img-xl"]   { width: 720px; height: auto; }
+.img-full, img[alt~="img-full"] { width: 100%;  height: auto; }
+
+/* Height scale (width stays proportional). Useful when a row of
+ * differently-shaped logos should share one visual height. */
+.img-h-xs, img[alt~="img-h-xs"] { height: 60px;  width: auto; }
+.img-h-sm, img[alt~="img-h-sm"] { height: 120px; width: auto; }
+.img-h-md, img[alt~="img-h-md"] { height: 200px; width: auto; }
+.img-h-lg, img[alt~="img-h-lg"] { height: 320px; width: auto; }
+
+/* Square (both dimensions equal). object-fit:cover crops the image
+ * to the square instead of squashing it, ideal for portraits,
+ * avatars, or icon tiles. Combine with `border-radius` inline if
+ * you want rounded corners. */
+.img-sq-sm, img[alt~="img-sq-sm"] { width: 120px; height: 120px; object-fit: cover; }
+.img-sq-md, img[alt~="img-sq-md"] { width: 220px; height: 220px; object-fit: cover; }
+.img-sq-lg, img[alt~="img-sq-lg"] { width: 300px; height: 300px; object-fit: cover; }
+.img-sq-xl, img[alt~="img-sq-xl"] { width: 400px; height: 400px; object-fit: cover; }
+
+/* ---------- Block alignment (works on <img>, <div>, <p>) ---------- */
+.center, img[alt~="center"] { display: block; margin-left: auto; margin-right: auto; }
+.left,   img[alt~="left"]   { display: block; margin-left: 0;    margin-right: auto; }
+.right,  img[alt~="right"]  { display: block; margin-left: auto; margin-right: 0; }
+
+/* ---------- Flex row / column ----------
+ * <div class="row">    …horizontal, evenly spaced items
+ * <div class="row row-center">  …horizontal, centered
+ * <div class="col">    …vertical stack, spaced apart */
+.row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.row-center { justify-content: center; }
+.row-between { justify-content: space-between; }
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Equal-column grids for logo walls, comparison tables, etc.
+ * <div class="cols-3">
+ *   <img src="…"><img src="…"><img src="…">
+ * </div> */
+.cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; align-items: center; }
+.cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: center; }
+.cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; }
+
+/* ---------- Logo walls ----------
+ * Uniform grid for logo groups. Each cell centers its image and caps
+ * the height. Override columns/height with a modifier or inline style:
+ *   <div class="logo-wall logo-wall-lg" style="grid-template-columns: repeat(4, 1fr)">
+ *     <img ...>
+ *   </div>
+ */
+.logo-wall {
+  display: grid;
+  gap: 28px 36px;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  margin-top: 12px;
+}
+.logo-wall img {
+  max-width: 100%;
+  max-height: 140px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}
+.logo-wall-lg img { max-height: 210px; }
+.logo-wall-sm img { max-height: 60px; }
+
+/* ---------- CNCF banner ----------
+ * Full-width horizontal strip for the CNCF banner PNG at the
+ * bottom of the "We work with" slide. Caption above the banner
+ * calls out Flatcar's CNCF Incubating status. */
+.cncf-banner {
+  margin-top: 22px;
+  width: 100%;
+}
+.cncf-banner-caption {
+  font-size: 20px;
+  color: var(--muted);
+  text-align: center;
+  margin: 0 0 10px 0;
+  letter-spacing: 0.01em;
+}
+.cncf-banner-caption strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+.cncf-banner img {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12));
+}
+
+/* ---------- Edge & corner pins ----------
+ * Absolute-position an element to a slide edge, corner, or center.
+ * Every <section> is `position: relative`, so these anchor to the
+ * slide edges. The 60px inset matches the sidebar layouts' padding.
+ *
+ * Two-letter suffix = vertical + horizontal:
+ *   t  = top       (60px inset)
+ *   mt = middle-top (25% down, between top and middle)
+ *   m  = middle     (50%, dead center)
+ *   mb = middle-bottom (75% down, between middle and bottom)
+ *   b  = bottom    (60px inset)
+ *   l = left,   c = center,   r = right
+ *
+ * Works via class OR image alt-text:
+ *   <img class="img-sm pin-br" src="…">
+ *   ![pin-br img-sm](…) */
+.pin-tl,  img[alt~="pin-tl"]  { position: absolute; top: 60px;    left: 60px; }
+.pin-tc,  img[alt~="pin-tc"]  { position: absolute; top: 60px;    left: 50%; transform: translateX(-50%); }
+.pin-tr,  img[alt~="pin-tr"]  { position: absolute; top: 60px;    right: 60px; }
+.pin-mtl, img[alt~="pin-mtl"] { position: absolute; top: 25%;     left: 60px;  transform: translateY(-50%); }
+.pin-mtc, img[alt~="pin-mtc"] { position: absolute; top: 25%;     left: 50%;   transform: translate(-50%, -50%); }
+.pin-mtr, img[alt~="pin-mtr"] { position: absolute; top: 25%;     right: 60px; transform: translateY(-50%); }
+.pin-ml,  img[alt~="pin-ml"]  { position: absolute; top: 50%;     left: 60px;  transform: translateY(-50%); }
+.pin-mc,  img[alt~="pin-mc"]  { position: absolute; top: 50%;     left: 50%;   transform: translate(-50%, -50%); }
+.pin-mr,  img[alt~="pin-mr"]  { position: absolute; top: 50%;     right: 60px; transform: translateY(-50%); }
+.pin-mbl, img[alt~="pin-mbl"] { position: absolute; top: 75%;     left: 60px;  transform: translateY(-50%); }
+.pin-mbc, img[alt~="pin-mbc"] { position: absolute; top: 75%;     left: 50%;   transform: translate(-50%, -50%); }
+.pin-mbr, img[alt~="pin-mbr"] { position: absolute; top: 75%;     right: 60px; transform: translateY(-50%); }
+.pin-bl,  img[alt~="pin-bl"]  { position: absolute; bottom: 60px; left: 60px; }
+.pin-bc,  img[alt~="pin-bc"]  { position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); }
+.pin-br,  img[alt~="pin-br"]  { position: absolute; bottom: 60px; right: 60px; }
+
+/* Native markdown `![pin-br](…)` wraps the <img> in a <p>. The img
+ * is absolute (out of flow) but the empty <p> still eats a line.
+ * `display: contents` makes the <p> disappear from the box tree
+ * while keeping the img in place. */
+section p:has(> img[alt*="pin-"]),
+section p:has(> img[alt*="pane-"]) {
+  display: contents;
+}
+
+/* ---------- Callout boxes ----------
+ * <div class="callout">
+ *   **Note:** Flatcar is immutable, no `apt install`.
+ * </div> */
+.callout {
+  border-left: 4px solid var(--accent-cyan);
+  background: #F1F2F6;
+  padding: 14px 20px;
+  border-radius: 0 4px 4px 0;
+  margin: 12px 0;
+}
+.callout-warn { border-left-color: #E0A800; background: #FFF8E1; }
+.callout-ok   { border-left-color: #12766A; background: #E6F4F1; }
+
+/* ---------- A/B Updates diagram (A/B partition lifecycle) ----------
+ * Tweak the whole diagram by editing ONE value below:
+ *   --ab-scale   overall size multiplier (1.0 = current, 0.9 = 10% smaller, 1.1 = 10% bigger)
+ *   --ab-vgap    vertical gap between cards (in scaled units)
+ *   --ab-icon-w  width of the cycle icon column (px, unscaled)
+ */
+.ab-slide {
+  --ab-scale: 1;
+  --ab-vgap: 9px;
+  --ab-icon-w: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(720px - 160px);
+}
+.ab-wrap  { display: flex; align-items: center; gap: calc(17px * var(--ab-scale)); }
+.ab-stack { flex: 1; display: flex; flex-direction: column; gap: calc(var(--ab-vgap) * var(--ab-scale)); }
+.ab-card {
+  display: grid;
+  grid-template-columns: calc(215px * var(--ab-scale)) auto 1fr;
+  align-items: center;
+  gap: calc(17px * var(--ab-scale));
+  border: 2px solid var(--bg-navy);
+  border-radius: calc(14px * var(--ab-scale));
+  padding: calc(9px * var(--ab-scale)) calc(18px * var(--ab-scale));
+  background: #FFFFFF;
+  box-shadow: 0 5px 15px rgba(18,23,43,.08);
+}
+.ab-title { font-size: calc(21.5px * var(--ab-scale)); font-weight: 700; color: var(--bg-navy); display: flex; align-items: center; gap: calc(11px * var(--ab-scale)); }
+.ab-num {
+  display: inline-flex;
+  width: calc(33px * var(--ab-scale)); height: calc(33px * var(--ab-scale));
+  border-radius: 50%;
+  background: var(--bg-navy); color: var(--accent-cyan);
+  align-items: center; justify-content: center;
+  font-size: calc(18px * var(--ab-scale)); font-weight: 700; flex-shrink: 0;
+}
+.ab-slots { display: flex; gap: calc(10px * var(--ab-scale)); }
+.ab-slot {
+  border-radius: calc(10px * var(--ab-scale));
+  padding: calc(6px * var(--ab-scale)) calc(12px * var(--ab-scale));
+  display: flex; align-items: baseline; gap: calc(10px * var(--ab-scale));
+}
+.ab-slot.active  { background: var(--bg-navy); color: #FFFFFF; }
+.ab-slot.active .ab-label { color: var(--accent-cyan); }
+.ab-slot.passive { background: #EEF1F8; color: var(--bg-navy); }
+.ab-slot.staged  { background: #FFB84D; color: var(--bg-navy); }
+.ab-label { font-size: calc(16px * var(--ab-scale)); letter-spacing: .4px; text-transform: uppercase; font-weight: 800; opacity: 1; }
+.ab-ver {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-size: calc(22px * var(--ab-scale));
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.ab-caption { font-size: calc(15px * var(--ab-scale)); color: var(--muted); line-height: 1.3; }
+
+.ab-cycle-icon {
+  width: calc(var(--ab-icon-w) * var(--ab-scale));
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+.ab-cycle-icon svg {
+  width: 100%;
+  height: auto;
+  max-height: calc(200px * var(--ab-scale));
+}
+
+.ab-cycle {
+  font-size: calc(16.5px * var(--ab-scale));
+  color: var(--muted);
+  text-align: center;
+  margin-top: calc(12px * var(--ab-scale));
+}
+.ab-cycle strong { color: var(--bg-navy); }
+
+/* Titles are always bold, whatever a layout sets. */
+section :is(h1, h2, h3, h4, h5, h6) { font-weight: 700 !important; }

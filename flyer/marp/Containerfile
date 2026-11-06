@@ -1,0 +1,41 @@
+# Minimal extension of the official Marp CLI image.
+# Adds bash + make so the Makefile/scripts work inside the container.
+# Built and run via Podman (see Makefile / compose.yaml).
+FROM marpteam/marp-cli:latest
+
+USER root
+
+# Base image is Debian-based; bash is usually present, make is not.
+# We also install proper fonts so slide typography (Inter for body, JetBrains
+# Mono for code/version chips) renders consistently instead of falling back to
+# a generic bitmap font that Chromium synthesizes bold from (looks stretched).
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      bash make fontconfig \
+      python3 python3-pip librsvg2-bin \
+      fonts-inter \
+      fonts-jetbrains-mono \
+      fonts-firacode \
+      fonts-noto-core && \
+    fc-cache -f && \
+    pip3 install --no-cache-dir --break-system-packages python-pptx pillow pypdf && \
+    rm -rf /var/lib/apt/lists/*
+
+# The base image installs `marp` as the unprivileged `marp` user under
+# /home/marp/.npm-global/bin, which is NOT on root's PATH. Symlink it into
+# /usr/local/bin so `command -v marp` succeeds regardless of user; this
+# skips the slow `npx --yes @marp-team/marp-cli@latest` fallback in build.sh.
+RUN if [ -x /home/marp/.npm-global/bin/marp ]; then \
+      ln -sf /home/marp/.npm-global/bin/marp /usr/local/bin/marp; \
+    elif [ -x /usr/local/bin/marp ]; then \
+      : ; \
+    else \
+      npm install -g @marp-team/marp-cli; \
+    fi && \
+    marp --version
+
+WORKDIR /slides
+
+# Reset entrypoint (base image entrypoint is `marp`) so we can run scripts/shells
+ENTRYPOINT []
+CMD ["/bin/bash"]

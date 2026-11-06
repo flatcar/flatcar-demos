@@ -1,0 +1,34 @@
+# Build outputs & dependencies (regenerable)
+node_modules/
+artifacts/
+
+# Local reference dumps (e.g. PPTX image extractions)
+extracted-images/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment overrides
+.env
+.env.local
+
+# Full-resolution image backups (kept locally, out of git)
+assets/photo/group_photos/original/
+assets/logos/external/other/original/
+
+# Auto-converted PowerPoint
+
+# Local helper scripts
+local-scripts/
+
+# Native PowerPoint build
+build/slides-native.pptx
+build/pptx-assets/
