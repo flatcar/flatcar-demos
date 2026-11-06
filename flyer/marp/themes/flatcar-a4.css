@@ -1,0 +1,11 @@
+/* @theme flatcar-a4
+ *
+ * The Flatcar theme on an A4 portrait page (96 dpi: 794 x 1123 px), for
+ * printable one-pagers. Marp takes the PDF page size from the theme.
+ */
+@import 'flatcar';
+
+section {
+  width: 794px;
+  height: 1123px;
+}
