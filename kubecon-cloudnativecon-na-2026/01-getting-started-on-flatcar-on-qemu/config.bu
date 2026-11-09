@@ -1,0 +1,54 @@
+variant: flatcar
+version: 1.0.0
+passwd:
+  users:
+    # The default user. Only the public half of the throwaway keypair that
+    # run.sh generates is substituted in here.
+    - name: core
+      ssh_authorized_keys:
+        - __SSH_PUBLIC_KEY__
+    # A second user provisioned declaratively at first boot, in the docker
+    # and sudo groups. Same demo key, so you can SSH in as either user.
+    - name: demo
+      groups:
+        - docker
+        - sudo
+      ssh_authorized_keys:
+        - __SSH_PUBLIC_KEY__
+storage:
+  files:
+    # Set the hostname declaratively instead of logging in to change it.
+    - path: /etc/hostname
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: flatcar-demo
+    # A small script staged on disk, to show files land before first login.
+    - path: /opt/bin/welcome.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          echo "--- flatcar demo info ---"
+          echo "host: $(hostname)"
+          echo "date: $(date)"
+          docker info --format 'docker: {{.ServerVersion}}'
+systemd:
+  units:
+    # A oneshot unit that pulls and runs a container once on boot, to show
+    # Ignition wiring up systemd + Docker with no manual steps.
+    - name: hello-world.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Docker Hello World on Boot
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/docker run --rm --name hello-world hello-world
+
+        [Install]
+        WantedBy=multi-user.target
