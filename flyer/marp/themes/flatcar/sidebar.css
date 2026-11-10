@@ -1,0 +1,356 @@
+/* @theme flatcar-sidebar
+ *
+ * Rail layouts: `sidebar` (33%), `sidebar whoami` (bio variant),
+ * `agenda` (25%). Imported by the main `flatcar` theme.
+ */
+
+/* ---------------- SHARED: SIDEBAR / AGENDA ----------------
+ * Both layouts share a navy left rail with a cyan title; the
+ * difference is rail width (33% vs 25%) and right-pane content style.
+ * Note: `section:is(.foo)` form (no space, no nested `section`) because
+ * Marpit auto-prefixes selectors that don't start with `section`. */
+section:is(.sidebar, .agenda) {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--bg-navy), var(--bg-navy));
+  background-repeat: no-repeat;
+  background-position: left top;
+  position: relative;
+  color: var(--ink);
+}
+section:is(.sidebar, .agenda) h1 {
+  position: absolute;
+  top: 60px;
+  left: 60px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  background-image: none;
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+/* ---------------- SIDEBAR (33% rail + free-form right pane) ---------------- */
+section.sidebar {
+  background-size: 33% 100%;
+  padding: 60px 60px 60px calc(33% + 60px);
+  display: block;
+  /* Override Marp default's `safe center center` so content reads top-down. */
+  place-content: start start;
+}
+section.sidebar > *:not(h1) { margin-top: 0; }
+section.sidebar > * + *     { margin-top: 14px; }
+
+section.sidebar h1 {
+  width: calc(33% - 80px);
+  font-size: 44px;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+section.sidebar h2 {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 28px;
+  margin: 0 0 18px 0;
+}
+section.sidebar :is(p, ul, ol, table, pre):first-of-type {
+  margin-top: 0;
+}
+section.sidebar::after { color: var(--muted); }
+
+/* Borderless typographic tables in sidebar right pane. */
+section.sidebar table {
+  width: 100%;
+  margin: 0 0 12px 0;
+  border-collapse: collapse;
+  background: transparent;
+}
+section.sidebar :is(tr, th, td) {
+  background: transparent !important;
+  border: none !important;
+}
+section.sidebar th {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 24px;
+  text-align: left;
+  padding: 4px 24px 10px 0;
+  border-bottom: 2px solid var(--ink) !important;
+}
+section.sidebar td {
+  color: var(--ink);
+  font-size: 24px;
+  padding: 8px 24px 8px 0;
+  vertical-align: top;
+}
+
+/* Diagrams / illustrations dropped into the right pane. */
+section.sidebar > img,
+section.sidebar > p > img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  margin: 8px 0;
+}
+
+/* ---------------- SIDEBAR.whoami (bio variant) ----------------
+ * Slide markup uses raw HTML for the bio fixtures:
+ *   <img class="bio-photo" ...>
+ *   <p class="bio-github">...</p>
+ *   <div class="bio-logos">...</div>
+ */
+section.sidebar.whoami {
+  /* Right pane has a short bio, center it vertically so it aligns
+   * with the photo in the navy rail. */
+  place-content: center start;
+}
+section.sidebar.whoami h1 {
+  font-size: 56px;
+  letter-spacing: -0.01em;
+}
+section.sidebar.whoami h2 {
+  font-size: 52px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  max-width: 90%;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+section.sidebar.whoami :is(p, li) {
+  font-size: 32px;
+  line-height: 1.4;
+}
+section.sidebar.whoami ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 18px 0;
+}
+section.sidebar.whoami ul li {
+  padding-left: 14px;
+  position: relative;
+}
+section.sidebar.whoami ul li::before {
+  content: '-';
+  position: absolute;
+  left: 0;
+  color: var(--ink);
+}
+
+/* Photo: centred in the 33% rail, lower-middle vertically.
+ * Size is driven by one custom property so width/height/left stay in sync.
+ * Override per-slide with `style="--bio-photo-size: 320px"` on the <img>. */
+section.sidebar.whoami img.bio-photo {
+  --bio-photo-size: 220px;
+  position: absolute;
+  left: calc(16.5% - var(--bio-photo-size) / 2);
+  top: 280px;
+  width: var(--bio-photo-size);
+  height: var(--bio-photo-size);
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* GitHub handle: white text + icon, bottom of navy rail. */
+section.sidebar.whoami p.bio-github {
+  position: absolute;
+  left: 60px;
+  bottom: 50px;
+  width: calc(33% - 120px);
+  margin: 0;
+  color: var(--paper);
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+section.sidebar.whoami p.bio-github img {
+  width: 34px;
+  height: 34px;
+}
+
+/* Logo row: top-right of the white pane. */
+section.sidebar.whoami div.bio-logos {
+  position: absolute;
+  top: 60px;
+  right: 60px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+section.sidebar.whoami div.bio-logos img {
+  height: 74px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ---------------- AGENDA (25% rail + bullet list) ---------------- */
+section.agenda {
+  background-size: 25% 100%;
+  padding: 0;
+}
+section.agenda h1 {
+  font-size: 56px;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+section.agenda :is(ul, ol) {
+  position: absolute;
+  top: 60px;
+  left: calc(25% + 60px);
+  right: 60px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink);
+  font-size: 32px;
+  line-height: 1.7;
+}
+section.agenda li {
+  margin: 0.1em 0;
+  padding-left: 1.4em;
+  position: relative;
+}
+section.agenda li::before {
+  content: "\2022";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-cyan);
+  font-size: 1em;
+  line-height: 1.7;
+}
+section.agenda::after { color: var(--muted); }
+
+/* ============================================================
+ * PANE PINS (sidebar + agenda only)
+ * ------------------------------------------------------------
+ * Same pattern as the slide-wide `pin-*` utilities in base.css,
+ * but anchored to the RIGHT PANE (skipping the navy rail).
+ *
+ * Each layout declares its rail width via `--rail-width` so one
+ * set of rules serves both. The pane spans from
+ * `calc(var(--rail-width) + 60px)` on the left to `60px` from
+ * the right, matching the theme's 60px inset elsewhere.
+ *
+ * Two-letter suffix = vertical + horizontal:
+ *   t / mt / m / mb / b   ×   l / c / r
+ *
+ * (5 vertical stops: t=60px, mt=25%, m=50%, mb=75%, b=60px from bottom.)
+ *
+ * Works via class OR image alt-text (both hit the same rules):
+ *   <img class="pane-bc" src="…">
+ *   ![pane-bc](…)
+ *
+ * The <p> wrapper Marp adds around ![…](…) is neutralised by a
+ * `display: contents` rule in base.css that covers both pin-* and
+ * pane-* alt tokens.
+ * ============================================================ */
+
+section.sidebar { --rail-width: 33%; }
+section.agenda  { --rail-width: 25%; }
+
+/* All pane-* things are absolutely positioned. Substring selectors
+ * catch every variant (class name or alt token) in one rule. */
+section:is(.sidebar, .agenda) :is([class*="pane-"], img[alt*="pane-"]) {
+  position: absolute;
+  margin: 0;
+}
+
+/* --- Horizontal anchors (all rows) --- */
+section:is(.sidebar, .agenda) :is(
+  .pane-tl, .pane-mtl, .pane-ml, .pane-mbl, .pane-bl,
+  img[alt~="pane-tl"], img[alt~="pane-mtl"], img[alt~="pane-ml"], img[alt~="pane-mbl"], img[alt~="pane-bl"]
+) { left: calc(var(--rail-width) + 60px); }
+section:is(.sidebar, .agenda) :is(
+  .pane-tr, .pane-mtr, .pane-mr, .pane-mbr, .pane-br,
+  img[alt~="pane-tr"], img[alt~="pane-mtr"], img[alt~="pane-mr"], img[alt~="pane-mbr"], img[alt~="pane-br"]
+) { right: 60px; }
+
+/* --- Vertical anchors for corner/edge pins (element keeps natural size) --- */
+section:is(.sidebar, .agenda) :is(.pane-tl,  .pane-tr,  img[alt~="pane-tl"],  img[alt~="pane-tr"])  { top:    60px; }
+section:is(.sidebar, .agenda) :is(.pane-bl,  .pane-br,  img[alt~="pane-bl"],  img[alt~="pane-br"])  { bottom: 60px; }
+section:is(.sidebar, .agenda) :is(.pane-mtl, .pane-mtr, img[alt~="pane-mtl"], img[alt~="pane-mtr"]) { top: 25%; transform: translateY(-50%); }
+section:is(.sidebar, .agenda) :is(.pane-ml,  .pane-mr,  img[alt~="pane-ml"],  img[alt~="pane-mr"])  { top: 50%; transform: translateY(-50%); }
+section:is(.sidebar, .agenda) :is(.pane-mbl, .pane-mbr, img[alt~="pane-mbl"], img[alt~="pane-mbr"]) { top: 75%; transform: translateY(-50%); }
+
+/* --- Center pins as wrappers (<div class="pane-bc">…</div>) ---
+ * Both horizontal edges pinned → the wrapper becomes as wide as the
+ * pane. Flex centers children (usually an <img>) inside. */
+section:is(.sidebar, .agenda) :is(.pane-tc, .pane-mtc, .pane-mc, .pane-mbc, .pane-bc) {
+  left:  calc(var(--rail-width) + 60px);
+  right: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+section:is(.sidebar, .agenda) :is(.pane-tc, .pane-mtc, .pane-mc, .pane-mbc, .pane-bc) img {
+  max-width: 100%;
+  max-height: 220px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- Center pins as the <img> itself (leaf case, no wrapper) ---
+ * Same fluid-width behavior, but the img carries the class or alt
+ * token directly. Higher specificity than the wrapper rule above so
+ * it wins the box-model when both would match. */
+section:is(.sidebar, .agenda) img:is(
+  .pane-tc, .pane-mtc, .pane-mc, .pane-mbc, .pane-bc,
+  [alt~="pane-tc"], [alt~="pane-mtc"], [alt~="pane-mc"], [alt~="pane-mbc"], [alt~="pane-bc"]
+) {
+  left: calc(var(--rail-width) + 60px);
+  right: 60px;
+  max-width: calc(100% - var(--rail-width) - 120px);
+  max-height: 220px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- Vertical anchors for center pins (both wrapper + leaf cases) --- */
+section:is(.sidebar, .agenda) :is(.pane-tc,  img[alt~="pane-tc"])  { top:    60px; }
+section:is(.sidebar, .agenda) :is(.pane-bc,  img[alt~="pane-bc"])  { bottom: 60px; }
+section:is(.sidebar, .agenda) :is(.pane-mtc, img[alt~="pane-mtc"]) { top: 25%; transform: translateY(-50%); }
+section:is(.sidebar, .agenda) :is(.pane-mc,  img[alt~="pane-mc"])  { top: 50%; transform: translateY(-50%); }
+section:is(.sidebar, .agenda) :is(.pane-mbc, img[alt~="pane-mbc"]) { top: 75%; transform: translateY(-50%); }
+
+/* ---------- Sidebar-scoped pin & size overrides ----------
+ * `section.sidebar > p > img` (0,1,3) has higher specificity than the
+ * base utility rules (0,1,0 – 0,1,1) and would clobber `width` /
+ * `height` on pinned images. These sidebar-scoped copies (0,2,3) win.
+ * Only widths, heights, and pins need this, pane-* utilities are
+ * already sidebar-scoped upstream. */
+section.sidebar :is(.img-2xs,  img[alt~="img-2xs"])  { width: 48px;  height: auto; }
+section.sidebar :is(.img-xs,   img[alt~="img-xs"])   { width: 80px;  height: auto; }
+section.sidebar :is(.img-sm,   img[alt~="img-sm"])   { width: 160px; height: auto; }
+section.sidebar :is(.img-md,   img[alt~="img-md"])   { width: 320px; height: auto; }
+section.sidebar :is(.img-lg,   img[alt~="img-lg"])   { width: 560px; height: auto; }
+section.sidebar :is(.img-xl,   img[alt~="img-xl"])   { width: 720px; height: auto; }
+section.sidebar :is(.img-full, img[alt~="img-full"]) { width: 100%;  height: auto; }
+section.sidebar :is(.img-h-xs, img[alt~="img-h-xs"]) { height: 60px;  width: auto; }
+section.sidebar :is(.img-h-sm, img[alt~="img-h-sm"]) { height: 120px; width: auto; }
+section.sidebar :is(.img-h-md, img[alt~="img-h-md"]) { height: 200px; width: auto; }
+section.sidebar :is(.img-h-lg, img[alt~="img-h-lg"]) { height: 320px; width: auto; }
+section.sidebar :is(.img-sq-sm, img[alt~="img-sq-sm"]) { width: 120px; height: 120px; object-fit: cover; }
+section.sidebar :is(.img-sq-md, img[alt~="img-sq-md"]) { width: 220px; height: 220px; object-fit: cover; }
+section.sidebar :is(.img-sq-lg, img[alt~="img-sq-lg"]) { width: 300px; height: 300px; object-fit: cover; }
+section.sidebar :is(.img-sq-xl, img[alt~="img-sq-xl"]) { width: 400px; height: 400px; object-fit: cover; }
+
+/* Pins keep their positioning from base.css; we just need to reassert
+ * that pinned imgs are NOT `width: 100%; margin: 8px 0`. */
+section.sidebar :is([class*="pin-"], img[alt*="pin-"]) {
+  width: auto;
+  max-width: none;
+  margin: 0;
+}

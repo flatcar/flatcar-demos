@@ -1,0 +1,30 @@
+/* @theme flatcar
+ *
+ * Flatcar-branded Marp theme. The actual rules are split across
+ * three partial themes in `themes/flatcar/`:
+ *
+ *   fonts.css    embedded Overpass font
+ *   base.css     palette + default content slide (white + navy title bar)
+ *   dark.css     dark navy layouts (cover, lead, section, closing, quote)
+ *   sidebar.css  rail layouts (sidebar, sidebar whoami, agenda)
+ *
+ * Slide layouts (select with `<!-- _class: NAME -->`):
+ *   (none)            white slide, navy title bar + logo
+ *   cover             navy title slide w/ Flatcar icon + staircase + QR
+ *   lead              navy full-bleed for big statements
+ *   section           navy section divider (cyan title + staircase)
+ *   closing           navy slide w/ logo + "Thank you"
+ *   agenda            navy 25% rail + bullet list
+ *   sidebar           navy 33% rail + free-form right pane
+ *   sidebar whoami    bio variant of sidebar
+ *   quote             navy blockquote slide
+ *
+ * Marp resolves url() relative to slides.md, not these CSS files,
+ * so asset refs are written as `assets/...` (no leading `../`).
+ */
+
+@import 'default';
+@import 'flatcar-fonts';
+@import 'flatcar-base';
+@import 'flatcar-dark';
+@import 'flatcar-sidebar';

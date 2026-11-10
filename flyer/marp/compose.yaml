@@ -1,0 +1,17 @@
+services:
+  slides-builder:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: slides-builder:local
+    container_name: slides-builder
+    volumes:
+      # Mount the entire project directory.
+      # `:z` asks the container runtime to apply a shared SELinux label to the
+      # bind mount so rootless Podman on Fedora/RHEL can read the files.
+      # Docker on non-SELinux hosts silently ignores the suffix.
+      - .:/slides:z
+    working_dir: /slides
+    # Keep stdin open and allocate TTY for interactive use
+    stdin_open: true
+    tty: true

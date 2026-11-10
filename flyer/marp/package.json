@@ -1,0 +1,16 @@
+{
+  "name": "kubecon-na-2026-flyer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "One-page A4 Flatcar flyer, rebuilt in Marp",
+  "author": "Jan Bronicki <jane.doe@example.com>",
+  "scripts": {
+    "build": "mkdir -p build && marp --pdf --html --allow-local-files --no-stdin slides.md -o build/slides.pdf  --theme-set themes",
+    "watch": "marp -w --html --allow-local-files slides.md --theme-set themes",
+    "preview": "marp -p --html --allow-local-files slides.md --theme-set themes",
+    "html": "mkdir -p build && marp --html --allow-local-files --no-stdin slides.md -o build/slides.html --theme-set themes"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "^4.1.2"
+  }
+}
